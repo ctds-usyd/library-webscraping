@@ -16,22 +16,97 @@ keypoints:
 ---
 
 ## What is web scraping?
-Web scraping is a technique for extracting information from websites. This can be done by hand
-but most of the time it is automated in some way. It is closely related to the practice of
-web _indexing_, which is what search engines like Google do when mass analysing the Web to build
-their index. But contrary to _web indexing_, which typically parses the entire content of a web
-page to make it searchable, _web scraping_ targets specific information on the pages visited.
 
-For example, online stores will often scour the publicly available pages of their competitors,
-scrape item prices and then use this information to adjust their own prices. Another common
-practice is "contact scraping" in which contact information (such as email
-addresses) is collected for marketing purposes.
+Web scraping is a technique for **targeted, automated extraction of information from websites**.
 
-Web scraping is also increasingly being used by scholars for the purpose of building data sets for
-text mining projects, and journalists. The practice of
-[data journalism](https://en.wikipedia.org/wiki/Data_journalism), in particular, relies on the
-ability for investigative journalists to harvest data that is not always available in a form
-that allows analysis.
+For example:
+
+* Online stores will often scour the publicly available pages of their competitors,
+  scrape **item names and prices** and then use this information to adjust their own prices. 
+* Marketing databases may be compiled by scraping **contact information** such as email
+  addresses.
+
+Applications of scraping in research may include:
+
+* tracking trends in the real estate market by scraping data from real estate
+  web sites
+* collecting online article comments and other discourse for analysis
+* gathering data on membership and activity of online organisations
+
+### Behind the web's facade
+
+At the heart of the problem which web scraping solves is that the web is
+(mostly) designed for humans.  Very often, web sites are built to display
+**structured content** which is stored in a database on a web server.  Yet they
+tend to provide content in a way that loads quickly, is useful for someone with
+a mouse or a touchscreen, and looks good.  They format the structured content
+with templates, surround it with boilerplate content like headers, make parts
+of it shown or hidden with the click of a mouse.  Such presentation is often
+called **unstructured**.
+
+Web scraping aims to return specific content in a web site to a structured
+form: a database, a spreadsheet, an XML representation, etc.
+
+Web designers expect that readers will interpret the content by using prior
+knowledge of what a header looks like, what a menu looks like, what a *next
+page* link looks like, what a person's name, a location, an email address.
+Computers do not have this intuition.
+
+Web scraping therefore involves:
+
+* telling a computer how to navigate through a web site to find required
+  content (sometimes called *spidering*); and
+* providing *patterns* with which the computer can identify and extract
+  required content.
+
+### Not web scraping: structured content on the web
+
+There are, however, many forms of structured content on the web, which are
+(ideally) already *machine-readable* (although they may still need
+transformation to fit into your database/format of choice). These include:
+
+* Data downloads: some web sites provide their content in structured forms.
+  Some names for data formats include Excel, CSV, RSS, XML and JSON.
+* APIs: many major sources and distributors of content provide software
+  developers with a [web-based Application Programming
+  Interface](https://en.wikipedia.org/wiki/Web_API) to query and download their
+  often dynamic data in a structured format.  APIs tend to differ from each
+  other in design, so some new development tends to be required to get data
+  from each one. Most require some authentication like a username and password
+  before access is granted (even when it is granted for free).
+* semantic web knowledge bases: web sites providing structured knowledge, of
+  which [WikiData](http://wikidata.org) is a good example. These tend to be
+  structured as [OWL](https://en.wikipedia.org/wiki/Web_Ontology_Language)
+  ontologies, and can often be queried through
+  [SPARQL](https://en.wikipedia.org/wiki/SPARQL) endpoints or downloaded as
+  large data collections.
+* microformats: some web sites may overlay their visual content with [specially
+  schematised labels](http://schema.org) for certain kinds of knowledge, such
+  as publication metadata (title, author, publication date), contact details or
+  product reviews.  While web sites using microformats are by far in the
+  minority, where they are, specialised extraction tools do not need to be
+  developed.
+
+Before scraping a web site, it is always a good idea to check whether a
+structured representation of the same content is provided.
+
+### Not web scraping: information extraction
+
+Although it may sometimes be included under the rubric of web scraping, we are
+not going to cover tasks that target content in free text.  Such tasks, known
+by the name *information extraction* may seek a list of organisations
+mentioned, or may try to interpret a textual description of an event to build
+structure records of, say, casualties in national disasters or business
+acquisitions.  Related technology in text interpretation may try to determine
+if an author used positive or negative language.  Related technology in
+information extraction may try to aggregate content found in differently
+formatted tables across many web sites (or academic papers).
+
+These are real technologies, but not within scope of web scraping. In contrast
+to these, web scraping usually expects content to be consistently formatted,
+and extractable with very high precision (the extracted content is very clean
+of errors) and recall (the extracted content is complete from the pages
+visited).
 
 ## Example: scraping government websites for contact addresses
 
@@ -159,8 +234,33 @@ the information they contain. But before we launch into web scraping proper, we 
 a bit closer at how information is organized in an HTML document and how to build queries to access
 a specific subset of that information.
 
+## Tools and techniques for scraping
+
+A number of tools have been developed to help build web scrapers.  These differ
+in capability/expressiveness and in their usability without programming.
+Several of the available tools are associated with services which host the
+scraper and run it for a fee.
+We present the following tools:
+
+* [Scrapy](https://scrapy.org/) is a general framework for developing scrapers
+  in the Python programming language.  Its vast flexibility is matched by
+  substantial technical barriers to entry.
+* [Portia](https://scrapinghub.com/portia/) is a visual scraping tool built on
+  the Scrapy framework. It is free open-source software, such that you (or IT
+  support staff) can easily launch your own Portia instance to develop and run
+  scrapers. It still requires some technical knowledge about the structure of a
+  scraper and how to specify patterns for extracting specific content.
+* [Grepsr](https://www.grepsr.com) provides an extension for the Chrome
+  Browser, which delivers an extremely intuitive interface for building
+  scrapers with minimal technical knowledge. Although it demands a fee for any
+  substantial scraping project, its simplicity was outlying in our review of
+  available scraping tools, and serves us well as an introduction to the
+  scraping task.
+
+We will now drill down into scraping proceeding from the simplest tool the most
+intricate.
+
 # References
 
 * [Web Scraping (Wikipedia)](https://en.wikipedia.org/wiki/Web_scraping)
 * [The Data Journalism Handbook: Getting Data from the Web](http://datajournalismhandbook.org/1.0/en/getting_data_3.html)
-

@@ -28,13 +28,30 @@ The material in this section was adapted from the [XPath and XQuery Tutorial](ht
 written by [Kim Pham](https://github.com/kimpham54) ([@tolloid](https://twitter.com/tolloid))
 for the July 2016 [Library Carpentry workshop](https://code4libtoronto.github.io/2016-07-28-librarycarpentry/) in Toronto.
 
-# Introduction
+# Matching patterns
+
+A key part of web scraping is describing to the computer how it should find the
+content you seek.  Several tools have been designed for succinctly describing
+patterns that can be matched to document structure so that selected content can
+be efficiently extracted.  The most important for web scraping are:
+
+* Regular expression: These specify portions of strings of characters (e.g.
+  text, a URL). They can be used to identify, for instance, typical forms of
+  date (yyyy-mm-dd, d/m/yyyy, etc.) or of an email address, or whether a URL is
+  the kind of URL you want to download and scrape.
+* XPath: These specify parts of a tree-structured document, be it XML or HTML.
+  They can be very specific about which nodes to include or exclude.
+* CSS selectors: These serve a similar function to XPath, in selecting parts of
+  an HTML document, but were designed for web development (for applying styles
+  such as colour to parts of a document) and so are more commonly known, but
+  also more limited in what they can express than XPath.
+
 XPath (which stands for XML Path Language) is an _expression language_ used to specify parts of an XML document.
-XPath is rarely used on its own, rather it is used within software and languages that are aimed at manipulating
-XML documents, such as XSLT, XQuery or the web scraping tools that will be introduced later in this lesson.
-XPath can also be used in documents with a structure that is similar to XML, like HTML.
+XPath is often used within technologies aimed at manipulating XML documents, such as XSLT and XQuery.
+Later in this lesson we enter XPath expressions into web scraping tools, specifying parts of an HTML document to scrape.
 
 ## Markup Languages
+
 XML and HTML are _markup languages_. This means that they use a set of tags or rules to organise and provide
 information about the data they contain. This structure helps to automate processing, editing, formatting,
 displaying, printing, etc. that information.
@@ -48,8 +65,8 @@ This allows for exchange between incompatible systems and easier conversion of d
 > ## XML and HTML
 >
 > Note that HTML and XML have a very similar structure, which is why XPath can be used almost interchangeably to
-> navigate both HTML and XML documents. In fact, starting with HTML5, HTML documents are fully-formed XML documents.
-> In a sense, HTML is like a particular dialect of XML.
+> navigate both HTML and XML documents.
+> In a loose sense, HTML is like a particular dialect of XML.
 >
 {: .callout}
 
@@ -76,7 +93,7 @@ XML document follows basic syntax rules:
 XPath is written using expressions, and when these expressions are evaluated on XML documents they return an object
 containing the node(s) that you aim to select. Contrary to a flat text document, XML data is structured, as it is
 organized in nodes and subnodes.
-Therefore, when using XPath, we are not querying raw text or data values like we would so using Regular Expressions,
+Therefore, when using XPath, we are not querying raw text or data values like we would do using Regular Expressions,
 for example. Instead, XPath makes use of the fact that XML documents are structured and instead navigates through the
 node structure to select the data that we are looking for.
 
@@ -141,6 +158,8 @@ The most useful path expressions are listed below:
 |`text()`| Select the text content of a node|
 | &#124;|Pipe chains expressions and brings back results from either expression, think of a set union |
 
+
+TODO: XPath DINER http://www.topswagcode.com/xpath/
 
 ## Navigating through a webpage with XPath using a browser console
 
@@ -326,6 +345,29 @@ Array [ <blockquote.challenge>, <blockquote.challenge>, <blockquote.challenge>, 
 ~~~
 {: .output}
 
+
+TODO: format!
+
+In general, an element may have many classes, which are separated by space in
+the attribute. For example the following element has two classes, `author` and
+`author-id3451`.
+
+~~~
+<span class="author author-id3451">Jane Bloggs</span>
+~~~
+{: .source}
+
+CSS selectors make selecting by class easy: `.author` will select any element
+with the `author` class; `.author-id3451` any element with that class.
+
+XPath is unwieldy for expressing that an attribute should contain a particular
+whitespace-delimited word. The following is *usually* sufficient to match
+any element with an `author` class:
+
+~~~
+//*[contains(concat(' ', @class, ' '), ' author ')]
+~~~
+{: .source}
 
 > ## Select the "Introduction" title by ID
 > In a previous challenge, we were able to select the "Introduction" title because we knew it was
