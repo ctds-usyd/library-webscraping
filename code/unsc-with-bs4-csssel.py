@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     resolutions = scrape_unsc_resolutions()
 
-    with open('unsc-resolutions.csv') as out_file:
+    with open('unsc-resolutions.csv', 'w') as out_file:
         writer = csv.DictWriter(out_file, ['year', 'symbol', 'title', 'url'])
         writer.writeheader()
         for resolution in resolutions:
