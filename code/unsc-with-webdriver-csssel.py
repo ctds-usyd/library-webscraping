@@ -2,29 +2,28 @@
 """
 
 import time
-import requests
-from requests.compat import urljoin
-import bs4
+from selenium import webdriver
 
 
-def get_year_urls():
+def get_year_urls(driver):
     """Return a list of (year_url, year) pairs
     """
     # WARNING: the final / is very important when doing urljoin below
     base_url = 'http://www.un.org/en/sc/documents/resolutions/'
-    response = requests.get(base_url)
-    soup = bs4.BeautifulSoup(response.content, 'html.parser')
-    tables = soup.select('#content > table')
+    driver.get(base_url)
+    tables = driver.find_elements_by_css_selector('#content > table')
     # It's a good idea to check you captured something
     # and not more than you expected
     assert len(tables) == 1
 
     table = tables[0]
-    links = table.select('a')
+    links = table.find_elements_by_css_selector('a')
 
     out = []
     for link in links:
-        year_url = urljoin(base_url, link.attrs['href'])
+        # Note that the webdriver returns a resolved URL: not 1977.shtml
+        # as in the HTML, rather http://www.un.org/en/sc/documents/resolutions/1977.shtml
+        year_url = link.get_attribute('href')
         year = link.text
         # As well as converting to a number, this validates the year text is
         # what we expect
@@ -36,35 +35,34 @@ def get_year_urls():
     return out
 
 
-def get_resolutions_for_year(year_url, year):
+def get_resolutions_for_year(driver, year_url, year):
     """Return a list of dicts, each detailing 1 UNSC resolution from given year
     """
-    response = requests.get(year_url)
-    soup = bs4.BeautifulSoup(response.content, 'html.parser')
-    tables = soup.select('#content > table')
+    driver.get(year_url)
+    tables = driver.find_elements_by_css_selector('#content > table')
     if year != 1960 and year != 1964:
         # 1960 and 1964 have the entire page repeated twice!
         # Let's just use the first copy...
         assert len(tables) == 1
 
-    symbol_cells = tables[0].select('td:nth-of-type(1)')
+    symbol_cells = tables[0].find_elements_by_css_selector('td:nth-of-type(1)')
 
     out = []
     for symbol_cell in symbol_cells:
-        links = symbol_cell.select('a')
+        links = symbol_cell.find_elements_by_css_selector('a')
         if not links:
             # http://www.un.org/en/sc/documents/resolutions/2013.shtml
             # has a row which breaks our scraper. Skip it.
             print('Found a cell that does not have a view link: ',
                   symbol_cell.text)
             continue
-        url = links[0].attrs['href']
-        # TODO: Handle the 2014 quirk!!
-        title_cell = symbol_cell.find_next_sibling()
+        url = links[0].get_attribute('href')
+        # TODO: Handle the 2014 quirky date column!!
+        title_cell = symbol_cell.get_property('nextElementSibling')
         out.append({'year': year,
                     'title': title_cell.text,
                     'symbol': symbol_cell.text,
-                    'url': urljoin(year_url, url)})
+                    'url': url})
     return out
 
 
@@ -72,11 +70,20 @@ def scrape_unsc_resolutions():
     # Note that for some projects you might be scraping lots of data
     # over a long time, and so might not want to store all the data in
     # memory at the same time like this code does.
+    # driver = selenium.webdriver.PhantomJS(service_args=['--load-images=no'])
+
+    options = webdriver.ChromeOptions()
+    # Don't show web browser visually
+    options.add_argument('headless')
+    # Don't download images
+    options.add_experimental_option("prefs",
+                                    {"profile.managed_default_content_settings.images": 2})
+    driver = webdriver.Chrome(chrome_options=options)
+
     out = []
-    for year_url, year in get_year_urls():
-        time.sleep(0.01)
+    for year_url, year in get_year_urls(driver):
         print('Processing:', year_url)
-        out += get_resolutions_for_year(year_url, year)
+        out += get_resolutions_for_year(driver, year_url, year)
     return out
 
 
