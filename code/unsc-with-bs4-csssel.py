@@ -13,7 +13,7 @@ def get_year_urls():
     # WARNING: the final / is very important when doing urljoin below
     base_url = 'http://www.un.org/en/sc/documents/resolutions/'
     response = requests.get(base_url)
-    soup = bs4.BeautifulSoup(response.content, 'html.parser')
+    soup = bs4.BeautifulSoup(response.content, 'lxml')
     tables = soup.select('#content > table')
     # It's a good idea to check you captured something
     # and not more than you expected
@@ -40,17 +40,24 @@ def get_resolutions_for_year(year_url, year):
     """Return a list of dicts, each detailing 1 UNSC resolution from given year
     """
     response = requests.get(year_url)
-    soup = bs4.BeautifulSoup(response.content, 'html.parser')
+    # NOTE: a loose </tr> breaks parsing with html.parser engine in 2017.shtml
+    soup = bs4.BeautifulSoup(response.content, 'lxml')
     tables = soup.select('#content > table')
     if year != 1960 and year != 1964:
         # 1960 and 1964 have the entire page repeated twice!
-        # Let's just use the first copy...
+        # Let's just use the first copy in all cases...
         assert len(tables) == 1
 
-    symbol_cells = tables[0].select('td:nth-of-type(1)')
+    rows = tables[0].select('tr')
 
     out = []
-    for symbol_cell in symbol_cells:
+    for row in rows:
+        cells = row.select('td')
+        if len(cells) < 2:
+            # ignore the header
+            continue
+        symbol_cell = cells[0]
+        title_cell = cells[-1]
         links = symbol_cell.select('a')
         if not links:
             # http://www.un.org/en/sc/documents/resolutions/2013.shtml
@@ -59,12 +66,12 @@ def get_resolutions_for_year(year_url, year):
                   symbol_cell.text)
             continue
         url = links[0].attrs['href']
-        # TODO: Handle the 2014 quirk!!
-        title_cell = symbol_cell.find_next_sibling()
         out.append({'year': year,
                     'title': title_cell.text,
+                    # TODO: whitespace needs cleaning in these!
                     'symbol': symbol_cell.text,
                     'url': urljoin(year_url, url)})
+    assert len(out) > 1 or year == 1959
     return out
 
 

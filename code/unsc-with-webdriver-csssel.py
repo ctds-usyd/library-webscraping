@@ -42,13 +42,19 @@ def get_resolutions_for_year(driver, year_url, year):
     tables = driver.find_elements_by_css_selector('#content > table')
     if year != 1960 and year != 1964:
         # 1960 and 1964 have the entire page repeated twice!
-        # Let's just use the first copy...
+        # Let's just use the first copy in all cases...
         assert len(tables) == 1
 
-    symbol_cells = tables[0].find_elements_by_css_selector('td:nth-of-type(1)')
+    rows = tables[0].find_elements_by_css_selector('tr')
 
     out = []
-    for symbol_cell in symbol_cells:
+    for row in rows:
+        cells = row.find_elements_by_css_selector('td')
+        if len(cells) < 2:
+            # ignore the header
+            continue
+        symbol_cell = cells[0]
+        title_cell = cells[-1]
         links = symbol_cell.find_elements_by_css_selector('a')
         if not links:
             # http://www.un.org/en/sc/documents/resolutions/2013.shtml
@@ -57,12 +63,11 @@ def get_resolutions_for_year(driver, year_url, year):
                   symbol_cell.text)
             continue
         url = links[0].get_attribute('href')
-        # TODO: Handle the 2014 quirky date column!!
-        title_cell = symbol_cell.get_property('nextElementSibling')
         out.append({'year': year,
                     'title': title_cell.text,
                     'symbol': symbol_cell.text,
                     'url': url})
+    assert len(out) > 1 or year == 1959
     return out
 
 
