@@ -140,7 +140,7 @@ tabular form. Our task is to build a system which extracts a spreadsheet in
 comma-delimited (CSV) format with rows like:
 
 ~~~
-year,symbol,title,url
+date,symbol,title,url
 …
 2010,S/RES/1942 (2010),Côte d'Ivoire,http://www.un.org/en/ga/search/view_doc.asp?symbol=S/RES/1942(2010)
 2010,S/RES/1941 (2010),Sierra Leone,http://www.un.org/en/ga/search/view_doc.asp?symbol=S/RES/1941(2010)
@@ -151,7 +151,7 @@ year,symbol,title,url
 {: .output}
 
 This comma-delimited format lists each resolution on a separate line, with the
-fields "year", "symbol", "title" and "url" separated by commas (",").
+fields "date", "symbol", "title" and "url" separated by commas (",").
 
 Looking at the web site, it appears quite close to this format already: each page, such as
 [the one for 1962](http://www.un.org/en/sc/documents/resolutions/1962.shtml)
