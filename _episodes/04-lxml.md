@@ -14,9 +14,9 @@ objectives:
 - "Creating a two-step scraper to first extract URLs, visit them, and scrape their contents"
 - "Storing the extracted data"
 keypoints:
-- "requests is a Python library that helps downloading web pages"
-- "lxml is a Python library that parses HTML/XML and evaluates XPath/CSS selectors"
-- "A scraper involves code which identifies the set of URLs to scrape, and other code which extracts some elements from a page"
+- "`requests` is a Python library that helps downloading web pages."
+- "`lxml` is a Python library that parses HTML/XML and evaluates XPath/CSS selectors."
+- "A scraper can be divided into: identifying the set of URLs to scrape; extracting some elements from a page; and transforming them into a useful output format."
 - "It is important but challenging to be resilient to variation, by automatically validating and manually inspecting your extractions."
 ---
 
@@ -702,10 +702,16 @@ You are now ready to write your own scrapers!
 
 # Advanced topics and resources
 
-Caching; queuing/recursion; parallelism; alternative output formats; AJAX and other tricky instances from toscrape.com
+TODO: Caching; queuing/recursion; parallelism; alternative output formats; AJAX and other tricky instances from toscrape.com
 
+> ## So why didn't we learn Scrapy?
+> Scrapy provides a great framework for designing, implementing and managing robust and efficient scrapers. However, we get the sense that people who are not very experienced at programming find the declarative paradigm enabled by Scrapy very foreign.
+>
+> On the other hand, writing a more *procedural* scraper as we have here with the nuts and bolts of `requests` and `lxml` helps to motivate some of the issues that Scrapy endeavours to solve or ameliorate.
+{: .callout}
 
 # Reference
 
 * [requests documentation](http://docs.python-requests.org/en/master/)
 * [lxml documentation](http://lxml.de/api.html)
+* [Scrapy documentation](https://scrapy.org/)
