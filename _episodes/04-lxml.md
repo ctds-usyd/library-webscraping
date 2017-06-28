@@ -23,7 +23,7 @@ keypoints:
 # Recap
 Here is what we have learned so far:
 
-* We can use XPath queries to select what elements on a page to scrape.
+* We can use XPath or CSS selectors to select what elements on a page to scrape.
 * We can look at the HTML source code of a page to find how target elements are structured and
   how to select them.
 * We can use the browser console to try out XPath or CSS selectors on a live site.

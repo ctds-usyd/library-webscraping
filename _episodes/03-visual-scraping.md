@@ -94,7 +94,7 @@ The scrape pane gives us some options about how slowly Web Scraper should perfor
 
 Click _Sitemap (unsc-resolutions)_ to get the drop-down menu again, and _Selectors_ will return you to the root selectors. Note that you can click _Data preview_ for a quick and dirty alternative to actually running the scrape.
 
-## Scraping data for each year
+## A selector for resolutions
 
 Clicking the `year` ID will take you to _its_ child selectors; there are none. It will not take you to an example year page, so you will have to click a year link yourself, say 2016, to design its child selectors as they only apply in the context of each year.
 
@@ -106,264 +106,118 @@ We will now create a selector which captures each element containing data for a 
 * parent selector: `year`
 * selector: ???
 
-The selector for rows is, in this case, a bit tricky, for two reasons:
+Note that here we want to select an *Element* type, as we want to be able to further scrape within each of the resolution elements; we don't just want its text, for instance.
 
-1. The table heading is also a row, but doesn't contain resolution data, so a simple expression like `<tr>` which captures all table rows will not suffice. We cannot use CSS2 Selectors to say that we'd only like rows containing more than one `<td>` cell (though we could do this kind of thing with XPath). We can, however, use CSS2 selectors to get all but the first using an advanced version of `:nth-child` or `:nth-of-type`.
-2. Using the visual _Select_ tool, it is hard to select a row in entirety, as clicking anywhere in a table will select a cell `<td>` element or something within it.
+The selector for resolutions is, in this case, a bit tricky, for two reasons:
 
+1. Each resolution is presented in a table row `<tr>` element. The table title is also a row, but doesn't contain resolution data, so a simple expression like `<tr>` which captures all table rows will not suffice. We cannot use CSS2 Selectors to say that we'd only like rows containing more than one `<td>` cell (though we could do this kind of thing with XPath). We can, however, use CSS2 selectors to get all but the first using an advanced version of `:nth-child` or `:nth-of-type`.
+2. We want each selected element to contain *all* the data for a single resolution, not just its title, for instance. Using the visual _Select_ tool, it is hard to select a row in entirety, as clicking anywhere in a table will select a cell `<td>` element or something within it, rather than the row as a whole. To facilitate selecting the whole row, the _Select_ tool has a feature where pressing **P** on your keyboard will change the proposed selector so that it selects the _parents_ of the currently selected elements. So if you select a cell from the table and hit **P** it should select the row.
 
-# OLD
-
-
-We are interested in downloading this list to a spreadsheet, with columns for names and
-constituencies. Do do so, we will use the Scraper extension in the Chrome browser
-(refer to the [Setup](setup/) section for help installing these tools).
-
-## Scrape similar
-
-With the extension installed, we can select the first row of the House of Commons members
-list, do a right click and choose "Scrape similar" from the contextual menu:
-
-![Screenshot of the Scraper contextual menu]({{ page.root }}/fig/scraper-contextmenu.png)
-
-Alternatively, the "Scrape similar" option can also be accessed from the Scraper extension
-icon:
-
-![Screenshot of the Scraper menu]({{ page.root }}/fig/scraper-menu.png)
-
-Either operation will bring up the Scraper window:
-
-![Screenshot of the Scraper main window]({{ page.root }}/fig/scraper-ukparl-01.png)
-
-We recognize that Scraper has generated XPath queries that corresponds to the data we had
-selected upon calling it. The Selector (highlighted in red in the above screenshot)
- has been set to `//tbody/tr[td]` which selects
-all the rows of the table, delimiting the data we want to extract.
-
-In fact, we can try out that query using the technique that we learned in the previous
-section by typing the following in the browser console:
-
-~~~
-$x("//tbody/tr[td]")
-~~~
-{: .source}
-
-returns something like
-
-~~~
-<- Array [672]
-~~~
-{: .output}
-
-which we can explore in the console to make sure this is the right data.
-
-Scraper also recognized that there were two columns in that table, and has accordingly
-created two such columns (highlighted in blue in the screenshot), 
-each with its own XPath selector, `*[1]` and `*[2]`.
-
-To understand what this means, we have to remember that XPath queries are relative to the
-current context node. The context node has been set by the Selector query above, so
-those queries are relative to the array of `tr` elements that has been selected.
-
-We can replicate their effect by trying out 
-
-~~~
-$x("//tbody/tr[td]/*[1]")
-~~~
-{: .source}
-
-in the console. This should select only the first column of the table. The same goes for the
-second column.
-
-But in this case, we don't need to fiddle with the XPath queries too much, as Scraper was able to deduce
-them for us, and we can use the export functions to either create a Google Spreadsheet with the
-results, or copy them into the clipboard in Tab Separated Values (TSV) format for pasting into
-a text document, a spreadsheet or Open Refine.
-
-There is one bit of data cleanup we might want to do, though. If we paste the data copied from Scraper
-into a text document, we see something like this:
-
-~~~
-Name	Constituency
-A	back to top
-                                 Abbott, Ms Diane                                 (Labour)                             	Hackney North and Stoke Newington
-                                 Abrahams, Debbie                                 (Labour)                             	Oldham East and Saddleworth
-~~~
-{: .output}
-
-This is because there are a lot of unnecessary white spaces in the HTML that's behind that table, which
-are being captured by Scraper. We can however tweak the XPath column selectors to take advantage of the
-`normalize-space` XPath function:
-
-~~~
-normalize-space(*[1])
-normalize-space(*[2])
-~~~
-
-![Screenshot of the Scraper window showing the Column selectors]({{ page.root }}/fig/scraper-ukparl-02.png)
-
-We now need to tell Scraper to scrape the data again by using our new selectors, this is done by clicking
-on the "Scrape" button. The preview will not noticeably change, but if we now copy again the results
-and paste them in our text editor, we should see
-
-~~~
-Name	Constituency
-A	back to top
-Abbott, Ms Diane (Labour)	Hackney North and Stoke Newington
-Abrahams, Debbie (Labour)	Oldham East and Saddleworth
-Adams, Nigel (Conservative)	Selby and Ainsty
-~~~
-{: .output}
-
-which is a bit cleaner.
-
-> ## Scrape the list of Ontario MPPs
-> Use Scraper to export the list of [current members of the Ontario Legislative Assembly](http://www.ontla.on.ca/web/members/members_current.do?locale=en)
-> and try exporting the results in your favourite spreadsheet or data analysis
-> software.
->
-> Once you have done that, try adding a third column containing the URLs that are underneath
-> the names of the MPPs and that are leading to the detail page for each parliamentarian.
->
-> Tips:
-> 
-> * To add another column in Scraper, use the little green "+" icon in the columns list.
-> * Look at the source code and try out XPath queries in the console until you find what
->   you are looking for.
-> * The syntax to select the value of an attribute of the type `<element attribute="value">`
->   is `element/@attribute`.
-> * The `concat()` XPath function can be use to concatenate things.
+> ## Challenge: Construct a selector to get all resolution rows
+> Using either the _Select_ tool (and its **P** feature), or by manually composing an advanced (formula-based) `:nth-of-type` CSS Selector, capture all and only resolution rows from the page.
 >
 > > ## Solution
-> > 
-> > Add a third column with the XPath query
-> > 
-> > ~~~
-> > *[1]/a/@href
-> > ~~~
-> > {: .source}
-> >
-> > ![Screenshot of the Scraper window on the Ontario MPP page]({{ page.root }}/fig/scraper-ontparl-01.png)
-> > 
-> > This extracts the URLs, but as luck would have it, those URLs are relative to the list
-> > page (i.e. they are missing `http://www.ontla.on.ca/web/members/`). We can use the
-> > `concat()` XPath function to construct the full URLs:
-> >
-> > ~~~
-> > concat('http://www.ontla.on.ca/web/members/',*[1]/a/@href)
-> > ~~~
-> > {: .source}
-> >
-> > ![Screenshot of the Scraper window on the Ontario MPP page]({{ page.root }}/fig/scraper-ontparl-02.png)
-> >
+> > One solution CSS selector is `tr:nth-of-type(n+2)`. To get this with the visual _Select_ tool:
+> > 1. Click _Select_ to launch the tool
+> > 2. Click the top cell of the table with a resolution title in it. A selector such as `tr:nth-of-type(2) td:nth-of-type(3)` should appear.
+> > 3. Press **P** on your keyboard. The selector should now become something like `tr:nth-of-type(2)`.
+> > 4. Click on another row of data. The selector should now be `tr:nth-of-type(n+2)`. Confirm that all the rows we want are included. Click _Done Selecting_.
 > {: .solution}
 {: .challenge}
 
+Save selector!
 
+## The data for each resolution
 
-## Custom XPath queries
+We finally need to add child selectors of the `resolution` selector. Click the row for the `resolution` selector to see its children. There are currently none. Let's make some for `symbol`, `url`, `date` and `title`.
 
-Sometimes, however, we do have to do a bit of work to get Scraper to select the data elements
-that we are interested in.
+Click _Add new selector_, and enter:
 
-Going back to the example of the Canadian Parliament we saw in the introduction,
-there is a page on the same website that [lists the mailing addresses](http://www.parl.gc.ca/Parliamentarians/en/members/addresses) of all
-parliamentarians. We are interested in scraping those addresses.
+* id: `symbol`
+* type: Text
+* selector: `td:nth-of-type(1)`
+* multiple: not checked
+* parent: `resolution`
 
-If we select the addresses for the first MP and try the "Scrape similar" function...
+Note that we do not check _multiple_ because, although there are multiple on the page, we only want one per `resolution`, being the context (parent) of this selector. Note, similarly, that using the _Select_ tool only allows us to select from within the first matching resolution element. Save selector!
 
-![Screenshot of the Scraper context menu being used on an address block]({{ page.root }}/fig/scraper-canparl-01.png)
+Add another:
 
-Scraper produces this:
+* id: `symbol`
+* type: Element attribute (although you could instead use Link)
+* selector: `a`
+* multiple: not checked
+* attribute name: `href`
+* parent: `resolution`
 
-![Screenshot of the Scraper window trying to scrape addresses]({{ page.root }}/fig/scraper-canparl-02.png)
-
-which does a nice job separating the address elements, but what if instead we want a table of
-the addresses of all MPs? Selecting multiple addresses instead does not help. Remember what we said
-about computers not being smart about structuring information? This is a good example. We humans
-know what the different blocks of texts on the screen mean, but the computer will need some help from
-us to make sense of it.
-
-We need to tell Scraper what exactly to scrape, using XPath.
-
-If we look at the HTML source code of that page, we see that individual MPs are all within `ul`
-elements:
+Using the `Element attribute` type allows us to get the value of the `href` attribute on each `<a>` element in the row. The `href` attribute is where the link target is stored. For example, one HTML fragment looks like:
 
 ~~~
-(...)
-<ul>
-   <li><h3>Aboultaif, Ziad</h3></li>
-   <li>
-      <span class="addresstype">Hill Office</span>
-      <span>Telephone:</span>
-      <span>613-992-0946</span>
-      <span>Fax:</span>            
-      <span>613-992-0973</span>
-   </li>
-   <li>
-         <ul>       
-            <li><span class="addresstype">Constituency Office(s)</span></li>
-            <li>                            
-               <span>8119 - 160 Avenue (Main Office)</span>
-               <span>Suite 204A</span>
-               <span>Edmonton, Alberta</span>
-               <span>T5Z 0G3</span>
-               <span>Telephone:</span> <span>780-822-1540</span>
-               <span>Fax:</span> <span>780-822-1544</span>                                    
-               <span class="spacer"></span>
-            </li>                         
-      </ul>
-   </li>                                   
-</ul>   
-(...)
+<td class="class"><a href="http://www.un.org/en/ga/search/view_doc.asp?symbol=S/RES/2335(2016)">S/RES/2335 (2016)</a></td>
 ~~~
 {: .output}
 
-So let's try changing the Selector XPath in Scraper to
+We should at this point use the _Data Preview_ feature to see what will be extracted. For instance, click `year`:
 
-~~~
-//body/div[1]/div/ul
-~~~
-{: .source}
+![Clicking `year` for data preview]({{page.root}}/fig/web-scraper-click-year-for-preview.png)
 
-and hit "Scrape". We get something that is closer to what we want, with one line per MP, but
-the addresses are still all in one block of unstructured text:
+Then click Data Preview on the `resolution` row to see the following:
 
-![Screenshot of the Scraper window trying to scrape addresses]({{ page.root }}/fig/scraper-canparl-03.png)
+![Resolution data preview]({{page.root}}/fig/web-scraper-data-preview.png)
 
-Looking closer at the HTML source, we see that name and addresses are separated by `li` elements
-within those `ul` elements. So let's add a few columns based on those elements:
+(Note that we intentionally did not click `_root` for data preview, because the data preview feature can only show data extracted from the current page. The current page is a resolution page, while `_root`'s child selectors only work on the index page.)
 
-~~~
-./li[1] -> Name
-./li[2] -> Hill Office
-./li[3] -> Constituency
-~~~
-{: .source}
-
-This produces the following result:
-
-![Screenshot of the Scraper window scraping addresses]({{ page.root }}/fig/scraper-canparl-04.png)
-
-The addresses are still one big block of text each, but at least we now have a table for all MPs
-and the addresses are separated.
-
-> ## Scrape the Canadian MPs' phone numbers
-> Keep working on the example above to add a column for the Hill Office phone number
-> and fax number for each MP.
->
->
+> ## Challenge: add new selectors for `date` and `title`
+> Add new selectors under `resolution` for a resolution's title and date fields.
 > > ## Solution
-> > 
-> > Add columns with the XPath query
-> > 
-> > ~~~
-> > ./li[2]/span[3] -> Hill Office Phone
-> > ./li[2]/span[5] -> Hill Office Fax
-> > ~~~
-> > {: .source}
+> > The `date` selector could be:
+> > * id: `date`
+> > * type: Text
+> > * selector: `td:nth-of-type(2)`
+> > * multiple: not checked
+> > * parent: `resolution`
 > >
-> > ![Screenshot of the Scraper window on scraping MP phone numbers]({{ page.root }}/fig/scraper-canparl-05.png)
-> >
+> > The `title` selector could be:
+> > * id: `date`
+> > * type: Text
+> > * selector: `td:nth-of-type(3)`
+> > * multiple: not checked
+> > * parent: `resolution`
 > {: .solution}
 {: .challenge}
+
+> ## Improving open-source tools
+> We feel that some of this interface is quite unintuitive. If you have specific constructive critique for how the Web Scraper tool can be improved, you should:
+> * Look at the [list of issues](https://github.com/martinsbalodis/web-scraper-chrome-extension/issues) for the project and search through it to see if a similar suggestion has already been made. Perhaps use a GitHub account to indicate your support for that suggestion.
+> * [Create a new issue](https://github.com/martinsbalodis/web-scraper-chrome-extension/issues/new) to suggest a change or highlight a problem.
+> * Consider assisting in the development in the extension, if you have sufficient experience with the technologies used (JavaScript, HTML, CSS, etc.).
+{: .callout}
+
+## More data previews and some fixes
+
+Inspecting the Data Preview on `resolution` again, things look okay.
+
+![Complete resolution data preview for 2016]({{page.root}}/fig/web-scraper-data-preview2.png)
+
+Or at least they do for 2016. If we go to [1999](http://www.un.org/en/sc/documents/resolutions/1999.shtml) where we note that the date column doesn't exist, the `resolution` Data Preview shows us some issues.
+
+![Broken resolution data preview for 1999]({{page.root}}/fig/web-scraper-data-preview-1999bad.png)
+
+* `date` is filled with titles
+* `title` is filled with `null`
+* `url` doesn't have `http://...` at the front
+
+We need to get a bit creative and use advanced techniques to fix some of these up. By and large, we have identified something which visual scraping handles poorly: variation in the page structure. This may motivate having more control over your scraper by coding it up as we will in the next episode.
+
+For the `title` we can change the selector from `td:nth-of-type(3)` to `td:nth-last-of-type(1)`, as it is always the last column.
+
+We can more-or-less fix the `url` issue by telling Web Scraper to extract `symbol` as as Link (not a Text) with the `a` selector and this will extract the full, resolved URL of the link as well as the link text, in two separate columns of the extracted data. We can then delete the `url` selector.
+
+And we can fix (hackily!) the `date` issue by requiring that the date text have a certain form. We can use regular expressions: enter `^[0-9].*[0-9]$`. This matches only text which begins with a digit and ends with a digit. Hopefully (but we can only hope) this will not match any titles.
+
+## Run it!
+
+Choose _Scrape_ from the drop-down menu and _Start Scraping_.
+
+A window pops up where Web Scraper is doing its work: starting at the index then proceeding to each page of resolutions in turn.
+It will take around 5 minutes to run. When it is finished, _Export data as CSV_ and view the data in spreadsheet software such as Excel or Google Sheets. (We do not yet know of a way to make the Web Scraper extension only do part of a scrape!)

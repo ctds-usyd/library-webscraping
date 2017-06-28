@@ -571,13 +571,34 @@ combinators to get from those easy-to-identify elements to the target elements.
 We presented the `:nth-child` and `:nth-of-type` selectors, but we only showed that you can place a number inside their parentheses, like `:nth-child(2)`. However, you can put formulas in the parentheses:
 
 * `:nth-child(2n)` will select all even children
-* `:nth-child(2n + 1)` will select all odd children
+* `:nth-child(2n+1)` will select all odd children
 * `:nth-child(3n)` will select every third child
-* `:nth-child(n + 2)` will select every child except for the first
-* `:nth-child(an + b)` for any integers _a_ and _b_ will start selecting the _b_th child and select every _a_th child after that
+* `:nth-child(n+2)` will select every child except for the first
+* `:nth-child(an+b)` for any integers _a_ and _b_ will start selecting the _b_th child and select every _a_th child after that
 
-> ## Exercise
-> Select every second `<blockquote>` from the body of this page in the browser console. Experiment with other formulas.
+`:nth-last-child` and `:nth-last-of-type` parallel the above pseudo-selectors, but their formulas match from last to first, rather than first to last.
+
+> ## Challenge
+> 1. Select the headline `<h2>` of every second `<blockquote>` from the body of this page in the browser console.
+> 2. Select the headline `<h2>` of all but the first and the last `<blockquote>` from the body of this page in the browser console.
+>
+> > ## Solution
+> > 1. `document.querySelectorAll(".container > blockquote:nth-of-type(2n) > h2")`
+> > 2. `document.querySelectorAll(".container > blockquote:nth-of-type(n+2):nth-last-of-type(n+2) > h2")`
+> >
+> > Confirm that the right number of elements is returned with, for instance:
+> > ~~~
+> > all_blockquotes_count = document.querySelectorAll(".container > blockquote > h2").length
+> > selected_blockquotes_count = document.querySelectorAll(".container > blockquote:nth-of-type(n+2):nth-last-of-type(n+2) > h2").length
+> > all_blockquotes_count - selected_blockquotes_count
+> > ~~~
+> > {: .source}
+> > Expected result:
+> > ~~~
+> > 2
+> > ~~~
+> > {: .output}
+> {: .solution}
 {: .challenge}
 
 # Limitations of CSS Selectors
@@ -607,11 +628,18 @@ document.querySelectorAll("#select-this-challenge-box-text")[0].parentNode
 
 XPath is able to select on the basis of descendants. Unlike CSS it is also able to:
 
-* select just the first (or any other offset) of a set of elements (`:nth-child` and `:nth-of-type` can only select the first with respect to a parent)
-* return the value of an attribute on a matched element
-* return the text contained by matched elements
+* select just the first (or any other offset) of a set of elements. (`:nth-child` and `:nth-of-type` can only select the first with respect to a parent.)
+* select elements on the basis of the text they contain.
+* return the value of an attribute on a matched element.
+* return the text contained by matched elements.
 
 These too require a general-purpose programming language to solve when using CSS selectors.
+
+> ## Extensions to CSS selectors
+> Some tools that are able to evaluate CSS selectors extend them in custom ways. For instance, the popular web scripting library, JQuery, allows users to select elements containing particular text with selectors like `address:contains('Cat')`. The Python web scraping framework Scrapy allows users to select the text of a matched element rather than the element itself by ending the selector with `::text`; it allows users to select an attribute with `::attr('attribute-name')`.
+>
+> If it is not supported by web browsers, a CSS selector extension is considered *non-standard*, or may be proposed in a new standardised version of CSS Selectors that has not yet been adopted by web browsers. See the World Wide Web Consortium (W3C) for all the technical details of the [latest CSS Selector standards](https://www.w3.org/TR/selectors/).
+{: .callout}
 
 # Tools to help composing CSS selectors
 
