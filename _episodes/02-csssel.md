@@ -58,12 +58,12 @@ XML documents store data in plain text format. This provides a software- and har
 transporting, and sharing data. XML format is an open format, meant to be software agnostic. You can
 open an XML document in any text editor and the data it contains will be shown as it is meant to be represented.
 This allows for exchange between incompatible systems and easier conversion of data.
+HTML is like a dialect of HTML specialised for structuring web pages.
 
 > ## XML and HTML
 >
 > Note that HTML and XML have a very similar structure, which is why XPath and CSS selectors can be used almost interchangeably to
 > navigate both HTML and XML documents.
-> In a loose sense, HTML is like a particular dialect of XML.
 >
 {: .callout}
 
