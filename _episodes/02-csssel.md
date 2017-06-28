@@ -636,7 +636,7 @@ XPath is able to select on the basis of descendants. Unlike CSS it is also able 
 These too require a general-purpose programming language to solve when using CSS selectors.
 
 > ## Extensions to CSS selectors
-> Some tools that are able to evaluate CSS selectors extend them in custom ways. For instance, the popular web scripting library, JQuery, allows users to select elements containing particular text with selectors like `address:contains('Cat')`. The Python web scraping framework Scrapy allows users to select the text of a matched element rather than the element itself by ending the selector with `::text`; it allows users to select an attribute with `::attr('attribute-name')`.
+> Some tools that are able to evaluate CSS selectors extend them in custom ways. For instance, the popular web scripting library, [JQuery](https://api.jquery.com/category/selectors/), allows users to select elements containing particular text with selectors like `address:contains('Cat')`. The Python web scraping framework Scrapy allows users to select the text of a matched element rather than the element itself by ending the selector with `::text`; it allows users to select an attribute with `::attr('attribute-name')`.
 >
 > If it is not supported by web browsers, a CSS selector extension is considered *non-standard*, or may be proposed in a new standardised version of CSS Selectors that has not yet been adopted by web browsers. See the World Wide Web Consortium (W3C) for all the technical details of the [latest CSS Selector standards](https://www.w3.org/TR/selectors/).
 {: .callout}
@@ -661,5 +661,7 @@ Browser extensions such as [Selector Gadget](http://selectorgadget.com) or [CSS 
 
 # References
 
+* [W3Schools: CSS Selectors](https://www.w3schools.com/cssref/css_selectors.asp)
+* [W3Schools: HTML elements](https://www.w3schools.com/html/html_elements.asp)
 * [W3Schools: JavaScript HTML DOM Navigation](http://www.w3schools.com/js/js_htmldom_navigation.asp)
-* TODO
+* [Chrome devtools overview](https://developer.chrome.com/devtools)
