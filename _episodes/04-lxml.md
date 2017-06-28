@@ -710,7 +710,7 @@ You are now ready to write your own scrapers!
 
 # Advanced topics and resources
 
-TODO: Caching; queuing/recursion; parallelism; periodic scraping; cloud execution with morph.io; alternative output formats; AJAX and other tricky instances from toscrape.com; UA spoofing
+TODO: Caching; scraping an offline copy of a web sites; queuing/recursion; parallelism; periodic scraping; cloud execution with morph.io; alternative output formats; AJAX and other tricky instances from toscrape.com; UA spoofing
 
 > ## So why didn't we learn Scrapy?
 > Scrapy provides a great framework for designing, implementing and managing robust and efficient scrapers. However, we get the sense that people who are not very experienced at programming find the declarative paradigm facilitated by Scrapy very foreign.

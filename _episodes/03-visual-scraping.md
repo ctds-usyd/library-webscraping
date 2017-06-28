@@ -25,9 +25,10 @@ Many visual scrapers require you to pay for their services beyond a small number
 Some do not allow you to write your own XPath / CSS / regular expression selectors; some only support CSS or XPath but not the other.
 
 In designing this lesson, we have chosen to emphasise free solutions that give you ultimate control of the scraper and its data.
-As of June 2017, we have only found a few visual scraping tools that are [Free Open-Source Software](https://en.wikipedia.org/wiki/Free_and_open-source_software), including [webscraper.io's Web Scraper Chrome extension](http://webscraper.io/) and [Portia](https://scrapinghub.com/portia/).
+As of June 2017, we have only found a few visual scraping tools that are [Free Open-Source Software](https://en.wikipedia.org/wiki/Free_and_open-source_software), including [webscraper.io's Web Scraper Chrome extension](http://webscraper.io/), [David Heaton's Scraper Chrome extension](https://github.com/mnmldave/scraper) and [Portia](https://scrapinghub.com/portia/).
 While there are numerous advantages to Portia, we found it relatively difficult to install and ran into bugs (though it calls itself a Beta, so bugs are to be expected).
-In comparison to refined commercial tools, Web Scraper's user experience leaves much to be desired, but it is a flexible tool and a useful introduction to scraping without coding.
+Scraper is limited to extracting data from a single page, and also had some issues when we tested it.
+In comparison to refined commercial tools, Web Scraper's user experience leaves much to be desired, but it is a flexible tool (although it does not support XPath) and a useful introduction to scraping without coding.
 
 # Using the Web Scraper Chrome extension
 
@@ -220,7 +221,11 @@ And we can fix (hackily!) the `date` issue by requiring that the date text have 
 Choose _Scrape_ from the drop-down menu and _Start Scraping_.
 
 A window pops up where Web Scraper is doing its work: starting at the index then proceeding to each page of resolutions in turn.
-It will take around 5 minutes to run. When it is finished, _Export data as CSV_ and view the data in spreadsheet software such as Excel or Google Sheets. (We do not yet know of a way to make the Web Scraper extension only do part of a scrape!)
+It will take around 5 minutes to run.
+It should be possible to _Browse_ (under _Scrape_ in the drop-down menu) the data being collected during scraping.
+
+When it is finished, _Export data as CSV_ and view the data in spreadsheet software such as Excel or Google Sheets. (We do not yet know of a way to make the Web Scraper extension only do part of a scrape!)
+
 
 > ## Extension challenge: count how many resolutions there are per year
 > Use spreadsheet software to count the number of resolutions per year. Are any numbers surprising?
