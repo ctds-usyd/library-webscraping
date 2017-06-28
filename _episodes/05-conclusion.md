@@ -98,7 +98,7 @@ content off one website and posting it on another website (as our own), unless
 explicitly permitted, would constitute copyright violation and be illegal.
 
 However, most copyright legislations recognize cases in which reusing some, possibly
-copyrighted, information in an aggregate or derivative format is considered
+copyrighted, information in an aggregate or derivative form is considered
 "fair use". In general, unless the intent is to pass off data as our own, copy
 it word for word or trying to make money out of it, reusing publicly available
 content scraped off the internet is OK.
@@ -121,19 +121,16 @@ copyright.
 
 ## Be nice: ask and share
 
-Depending on the scope of your project, it might be worthwhile to consider asking
+Depending on the scope of your project, it might be worthwhile asking
 the owners or curators of the data you are planning to scrape if they have it
-already available in a structured format that could suit your project. If your
-aim is do use their data for research, or to use it in a way that could potentially
-interest them, not only it could save you the trouble of writing a
-web scraper, but it could also help clarify straight away what you can and cannot do
-with the data.
+available in a structured format. Not only could this save you the trouble of 
+writing a scraper, but it might help clarify straight away what you can and cannot do
+with the data, or if your work is of interest to them.
 
 On the other hand, when you are publishing your own data, as part of a research project,
-documentation or a public website, you might want to think about whether someone might
-be interested in getting your data for their own project. If you can, try to provide
-others with a way to download your raw data in a structured format, and thus save
-them the trouble to try and scrape your own pages!
+documentation or a public website, you might want to think about the most helpful way
+to share it: try to provide others with a way to download your raw data in a structured
+format, and thus save them the trouble of scraping your own pages!
 
 ## Web scraping code of conduct
 
@@ -167,7 +164,7 @@ be fine.
    requests per second. If you are writing a recursive scraper (i.e. that follows
    hyperlinks), test it on a smaller dataset first to make sure it does what it is
    supposed to do. Adjust the settings of your scraper to allow for a delay between
-   requests. By default, Scrapy uses conservative settings that should minimize this risk.
+   requests.
 7. __Publish your own data in a reusable way.__ Don't force others to write their own
    scrapers to get at your data. Use open and software-agnostic formats (e.g. JSON, XML),
    provide metadata (data about your data: where it came from, what it represents, how
@@ -177,9 +174,8 @@ be fine.
 ## Going further
 
 This lesson only provides an introduction to the practice of web scraping and highlights
-some of the tools available. Scrapy has many more features than those mentioned in the
-previous section, be sure to refer to its [full documentation](https://doc.scrapy.org/en/latest/)
-for details.
+some of the tools available. You might want to try out a commercial visual scraper or
+scraping framework (such as [Scrapy](https://doc.scrapy.org/en/latest/) in Python) in the programming language of your choice. If you're not sure what to scrape, a practice site such as [toscrape.com](http://toscrape.com) will provide some further challenges.
 
 Happy scraping!
 
