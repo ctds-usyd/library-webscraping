@@ -30,6 +30,8 @@ While there are numerous advantages to Portia, we found it relatively difficult 
 Scraper is limited to extracting data from a single page, and also had some issues when we tested it.
 In comparison to refined commercial tools, Web Scraper's user experience leaves much to be desired, but it is a flexible tool (although it does not support XPath) and a useful introduction to scraping without coding.
 
+See [Setup]({{page.root}}/Setup) for instructions on installing the browser extension.
+
 # Using the Web Scraper Chrome extension
 
 We are finally ready to do some web scraping. Let's go to the index of

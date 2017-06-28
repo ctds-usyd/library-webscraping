@@ -56,10 +56,8 @@ It is also able to construct new well-formed HTML/XML documents, element by elem
 To use CSS selectors, the [cssselect](https://pypi.python.org/pypi/cssselect) package must also be installed.
 
 Both of these require a Python installation (Python 2.7, or Python 3.4 and higher; although our example code will focus on Python 3),
-and each library (requests and lxml and cssselect) needs to be installed.
+and each library (requests and lxml and cssselect) needs to be installed as described in [Setup]({{page.root}}/Setup).
 If they are correctly installed, it should be possible to then write the following Python code without an error occurring:
-
-TODO: reference Setup page
 
 ~~~
 >>> import requests
@@ -68,7 +66,7 @@ TODO: reference Setup page
 ~~~
 {: .source}
 
-We will be working in Python. Open a text editor to edit a new file, saved as `unsc-scraper.py`.
+We will be working in Python. Open a text editor or IDE (such as Spyder) to edit a new file, saved as `unsc-scraper.py`.
 Check that you can run the file with Python, e.g. by running the following in a terminal:
 
 ~~~
