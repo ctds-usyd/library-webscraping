@@ -52,13 +52,18 @@ It facilitates extracting the text, attribute values or HTML for a particular el
 It knows how to handle badly-formed HTML (such as with a tag that is never closed, or is never opened), although it may not handle it identically to a particular web browser.
 It is also able to construct new well-formed HTML/XML documents, element by element.
 
+To use CSS selectors, the [cssselect](https://pypi.python.org/pypi/cssselect) package must also be installed.
+
 Both of these require a Python installation (Python 2.7, or Python 3.4 and higher; although our example code will focus on Python 3),
-and each library (requests and lxml) needs to be installed.
+and each library (requests and lxml and cssselect) needs to be installed.
 If they are correctly installed, it should be possible to then write the following Python code without an error occurring:
+
+TODO: reference Setup page
 
 ~~~
 >>> import requests
 >>> import lxml
+>>> import cssselect
 ~~~
 {: .source}
 
@@ -357,7 +362,7 @@ We have a few choices in how to code this up, too:
 1. Match all the symbols with one CSS selector evaluated over the document; match all the titles with another selector; merge them together.
 2. Match all the symbols' elements with one CSS selector, then iterate over its subsequent sibling elements to get the other fields.
 3. Match all the row elements with one CSS selector, then use a CSS selector within it to get each field.
-4. Match all the row elements with one CSS selector, then use the element's `.getchildren(...)` to get each field.
+4. Match all the row elements with one CSS selector, then use the element's `.getchildren(...)` to get each field's `<td>` element.
 
 We will take the last approach. Let's assume that the code for extracting `table` is basically the same as in `get_year_urls`:
 
@@ -698,14 +703,16 @@ TODO: plot resolution count by year, etc.
 > Hint: a tool for tabular data, [`pandas`](http://pandas.pydata.org) can read in CSV (`pandas.read_csv`) and can merge together multiple tables on the basis of some matching keys (`pandas.concat`).
 {: .challenge}
 
+While here we have extracted data that was already in tables into another tabular format, very often what we're processing doesn't look like a table on the web site. But the procedure is the same: identify the elements that you wish to extract, and apply a pattern which selects them from the HTML.
+
 You are now ready to write your own scrapers!
 
 # Advanced topics and resources
 
-TODO: Caching; queuing/recursion; parallelism; alternative output formats; AJAX and other tricky instances from toscrape.com
+TODO: Caching; queuing/recursion; parallelism; cloud execution with morph.io; alternative output formats; AJAX and other tricky instances from toscrape.com
 
 > ## So why didn't we learn Scrapy?
-> Scrapy provides a great framework for designing, implementing and managing robust and efficient scrapers. However, we get the sense that people who are not very experienced at programming find the declarative paradigm enabled by Scrapy very foreign.
+> Scrapy provides a great framework for designing, implementing and managing robust and efficient scrapers. However, we get the sense that people who are not very experienced at programming find the declarative paradigm facilitated by Scrapy very foreign.
 >
 > On the other hand, writing a more *procedural* scraper as we have here with the nuts and bolts of `requests` and `lxml` helps to motivate some of the issues that Scrapy endeavours to solve or ameliorate.
 {: .callout}
