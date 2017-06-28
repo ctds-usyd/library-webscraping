@@ -226,6 +226,8 @@ A window pops up where Web Scraper is doing its work: starting at the index then
 It will take around 5 minutes to run.
 It should be possible to _Browse_ (under _Scrape_ in the drop-down menu) the data being collected during scraping.
 
+You can also save a machine readable copy of your scraper details by selecting _Export Sitemap_ and copying the code there to a file.
+
 When it is finished, _Export data as CSV_ and view the data in spreadsheet software such as Excel or Google Sheets. (We do not yet know of a way to make the Web Scraper extension only do part of a scrape!)
 
 
@@ -233,3 +235,13 @@ When it is finished, _Export data as CSV_ and view the data in spreadsheet softw
 > Use spreadsheet software to count the number of resolutions per year. Are any numbers surprising?
 >
 > Hint: consider using a Pivot Table, and then a bar chart of the counts.
+> > ## Solution
+> > Here is a bar chart of resolutions by year constructed from a pivot table in Excel:
+> > ![Bar chart of resolutions by year]({{page.root}}/fig/web-scraper-unsc-bar-chart.png)
+> > Apart from the general increase in the rate of resolutions produced in the 1990s, 1960 stands out as an outlier. It turns out that our data has duplicate records in it. We will discuss this in the next episode.
+> {: .solution}
+{: .challenge}
+
+# References
+
+* [Web Scraper web site and tutorials](http://webscraper.io/)
