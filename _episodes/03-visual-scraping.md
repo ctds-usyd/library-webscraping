@@ -221,3 +221,8 @@ Choose _Scrape_ from the drop-down menu and _Start Scraping_.
 
 A window pops up where Web Scraper is doing its work: starting at the index then proceeding to each page of resolutions in turn.
 It will take around 5 minutes to run. When it is finished, _Export data as CSV_ and view the data in spreadsheet software such as Excel or Google Sheets. (We do not yet know of a way to make the Web Scraper extension only do part of a scrape!)
+
+> ## Extension challenge: count how many resolutions there are per year
+> Use spreadsheet software to count the number of resolutions per year. Are any numbers surprising?
+>
+> Hint: consider using a Pivot Table, and then a bar chart of the counts.

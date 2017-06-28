@@ -55,7 +55,7 @@ from accessing the site during that time, or even cause the server to run out of
 In fact, this is such an efficient way to disrupt a web site that hackers are often doing it on purpose.
 This is called a [Denial of Service (DoS) attack](https://en.wikipedia.org/wiki/Denial-of-service_attack).
 
-Since DoS attacks are unfortunately a common occurence on the Internet, modern web servers include
+Since DoS attacks are unfortunately a common occurrence on the Internet, modern web servers include
 measures to ward off such illegitimate use of their resources. They are watchful for large amounts
 of requests appearing to come from a single computer or IP address, and their first line of defense often involves
 refusing any further requests coming from this IP address.
@@ -91,7 +91,7 @@ In practice, however, web scraping is a tolerated practice, provided reasonable
 care is taken not to disrupt the "regular" use of a web site, as we have seen above.
 
 In a sense, web scraping is no different than using a web browser to visit a web page,
-in that it amounts to using computer software (a browser vs a scraper) to acccess
+in that it amounts to using computer software (a browser vs a scraper) to access
 data that is publicly available on the web.
 
 In general, if data is publicly available (the content that is being scraped is not
@@ -209,5 +209,5 @@ Happy scraping!
   followed indepentently. This lesson is heavily inspired by Software Carpentry.
 * [Data Carpentry](http://www.datacarpentry.org/) is a sister organisation of Software Carpentry
   focused on the fundamental data management skills required to conduct research.
-* [Library Carpentry](https://librarycarpentry.github.io/) is another Software Carpentry spinoff
+* [Library Carpentry](https://librarycarpentry.github.io/) is another Software Carpentry spin-off
   focused on software skills for librarians.
