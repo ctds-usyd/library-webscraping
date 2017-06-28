@@ -12,6 +12,7 @@ objectives:
 - "Using requests.get and resolving relative URLs"
 - "Traversing HTML and extracting data from it with `lxml`"
 - "Creating a two-step scraper to first extract URLs, visit them, and scrape their contents"
+- "Apprehending some of the things that can break when scraping"
 - "Storing the extracted data"
 keypoints:
 - "`requests` is a Python library that helps downloading web pages."
@@ -709,7 +710,7 @@ You are now ready to write your own scrapers!
 
 # Advanced topics and resources
 
-TODO: Caching; queuing/recursion; parallelism; cloud execution with morph.io; alternative output formats; AJAX and other tricky instances from toscrape.com
+TODO: Caching; queuing/recursion; parallelism; periodic scraping; cloud execution with morph.io; alternative output formats; AJAX and other tricky instances from toscrape.com; UA spoofing
 
 > ## So why didn't we learn Scrapy?
 > Scrapy provides a great framework for designing, implementing and managing robust and efficient scrapers. However, we get the sense that people who are not very experienced at programming find the declarative paradigm facilitated by Scrapy very foreign.

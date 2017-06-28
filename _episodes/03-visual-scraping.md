@@ -1,6 +1,6 @@
 ---
 title: "Visual scraping using browser extensions"
-teaching: 45
+teaching: 30
 exercises: 20
 questions:
 - "How can I get started scraping data off the web?"
