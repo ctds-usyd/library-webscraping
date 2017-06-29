@@ -708,7 +708,22 @@ You are now ready to write your own scrapers!
 
 # Advanced topics and resources
 
-TODO: Caching; scraping an offline copy of a web sites; queuing/recursion; parallelism; periodic scraping; cloud execution with morph.io; alternative output formats; AJAX and other tricky instances from toscrape.com; UA spoofing
+Aside from ethical questions addressed in the next episode, below are a number of advanced topics related to building a web scraper.  Most are features of existing specialised scraping frameworks, such as Scrapy, or commercial scraping tools.
+
+* __Caching and offline scraping__:
+  If you are expecting to scrape the same page many times, for instance while designing and debugging your scraper, it may be a good idea to download part or all of the web site to your own computer in advance of scraping it, so that you do not need to make repeated requests to the web server. Not only does this reduce the load on the web server, but it means the scraping is limited only by the speed of your scraper, not the speed at which you download the data. Some scraping frameworks may offer such caching out of the box; otherwise this involves using one of many existing tools to download a local copy of some web site, or writing the `requests` part of your scraper as a separate process that saves the pages in a database or files on your machine.
+* __Scraping many pages at once__:
+  Some pages cannot be scraped until another is done. For instance, you may not be able to scrape a listing of resolutions until you know that page exists by looking at the index page.
+  But in many cases, multiple pages can be scraped at the same time (as long as doing so does not make too many requests to the same server in a short period). Doing so can make the scraping process faster.
+  Scraping frameworks may offer the ability to process pages _in parallel_ (or _asynchronously_).
+  If you take advantage of this feature, make sure to be careful how you log messages about issues with the scrape, or it might be hard to tell which page it came from.
+* __Periodic scraping__:
+  One of web scraping's benefits is its ability to collect data from some web site as it changes over time (assuming the page content changes, but not the page structure). Scrapers can be set up to run periodically.
+* __Running the scraper on the cloud__:
+  You may not want to leave your own computer on to scrape. It may take resources away from your work, for instance. Commercial scrapers offer to run your scraper on their machines. A free alternative is [morph.io](http://morph.io) which offers to host your open-source scraper in the cloud and return the data to you.
+* __Alternative output formats__: Some structures of information are not suitable to put into a table; others are too big to store in a single table. Scraping frameworks may support storing the scraped data in a database or some other structure.
+* __User-Agent spoofing__: TODO
+* __Data only accessible through interaction__: Sometimes a web site requires logging in, or you only get access to the data by clicking on or scrolling down the page.  While particular cases may be engineered with a traditional `requests`-based scraper, an alternative is to employ a _web driver_. This is a web browser that is controlled by a program instead of a human, and will naturally run scripts associated with a web page, but can also do things like clicking, scrolling, etc. Emulating a human's interactions can give your scraper access to everything a human can get. The [Web Scraping Sandbox, toscrape.com](http://toscrape.com/) includes several variants of the same artificial web site, including with login forms and "infinite scroll"s that require this kind of scraper. Challenge yourself to scraping the data on that site!
 
 > ## So why didn't we learn Scrapy?
 > Scrapy provides a great framework for designing, implementing and managing robust and efficient scrapers. However, we get the sense that people who are not very experienced at programming find the declarative paradigm facilitated by Scrapy very foreign.
