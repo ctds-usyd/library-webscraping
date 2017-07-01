@@ -119,6 +119,16 @@ will help you sort out the legal aspects of your project. The
 university library is often the best place to start looking for help on
 copyright.
 
+### Robots Exclusion Standard
+
+If your scraper involves visiting large portions of a web site, it may be
+appropriate to adhere to the [robots.txt standard](https://en.wikipedia.org/wiki/Robots.txt)
+which allows web scrapers to specify parts of their site that should not be
+indexed by web search.
+
+`robots.txt` has no legal standing, but it is a matter of etiquette that,
+when broken, could lead a site administrator to block your scraper.
+
 ## Be nice: ask and share
 
 Depending on the scope of your project, it might be worthwhile asking
