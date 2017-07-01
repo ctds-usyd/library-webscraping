@@ -1,7 +1,7 @@
 ---
 title: "Conclusion"
 teaching: 15
-exercises: 15
+exercises: 0
 questions:
 - "When is web scraping OK and when is it not?"
 - "Is web scraping legal? Can I get into trouble?"

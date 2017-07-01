@@ -1,6 +1,6 @@
 ---
 title: "Web scraping using Python: requests and lxml"
-teaching: 90
+teaching: 40
 exercises: 30
 questions:
 - "How can scraping a web site be automated?"

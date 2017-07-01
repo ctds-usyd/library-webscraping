@@ -1,7 +1,7 @@
 ---
 title: "Visual scraping using browser extensions"
-teaching: 30
-exercises: 20
+teaching: 25
+exercises: 15
 questions:
 - "How can I get started scraping data off the web?"
 - "How can I use CSS selectors to precisely select what data to scrape?"
