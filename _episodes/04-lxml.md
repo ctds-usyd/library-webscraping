@@ -169,6 +169,16 @@ When we print the text of that parent node, we see that it consists of two blank
 >
 {: .callout}
 
+> ## Beautiful Soup, an alternative interface to lxml
+> [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/)
+> (or bs4) provides similar functionality to lxml and is
+> commonly used for web scraping. It does not, however, support XPath.
+> We also found it gave us worse results when our target web site had errors in
+> its HTML (using the `html.parser` backend). In some ways, Beautiful
+> Soup may have a more friendly design for web scraping (e.g. its handling
+> of text).
+{: .callout}
+
 Apart from basic features of Python, these are all the tools we should need.
 
 # UNSC scraper overview
