@@ -9,16 +9,20 @@ questions:
 - "How can I format scraped data as a spreadsheet?"
 - "How do I build a scraper that is resilient to change and aberration?"
 objectives:
-- "Using requests.get and resolving relative URLs"
+- "Using `requests.get` and resolving relative URLs with `urljoin`"
 - "Traversing HTML and extracting data from it with `lxml`"
 - "Creating a two-step scraper to first extract URLs, visit them, and scrape their contents"
 - "Apprehending some of the things that can break when scraping"
 - "Storing the extracted data"
 keypoints:
-- "`requests` is a Python library that helps downloading web pages."
+- "`requests` is a Python library that helps downloading web pages, primarily with `requests.get`."
+- "`requests.compat.urljoin(response.url, href)` may be used to resolve a relative URL `href`."
 - "`lxml` is a Python library that parses HTML/XML and evaluates XPath/CSS selectors."
+- "`lxml.etree.HTML(page_source)` will produce an element tree from some HTML code."
+- "An element tree's `cssseelct` and `xpath` methods extract elements of interest."
 - "A scraper can be divided into: identifying the set of URLs to scrape; extracting some elements from a page; and transforming them into a useful output format."
-- "It is important but challenging to be resilient to variation, by automatically validating and manually inspecting your extractions."
+- "It is important but challenging to be resilient to variation in page structure: one should automatically validate and manually inspect their extractions."
+- "A framework like [Scrapy](http://scrapy.org) may help to build robust scrapers, but may be harder to learn."
 ---
 
 # Recap
@@ -28,7 +32,7 @@ Here is what we have learned so far:
 * We can look at the HTML source code of a page to find how target elements are structured and
   how to select them.
 * We can use the browser console to try out XPath or CSS selectors on a live site.
-* We can use the visual scrapers to handle some basic scraping tasks. These help determine an appropriate selector, and may also perform spidering.
+* We can use visual scrapers to handle some basic scraping tasks. These help determine an appropriate selector, and may also perform spidering.
 
 This is quite a toolset already, and it's probably sufficient for a number of use cases, but there are
 limitations in using the tools we have seen so far.
@@ -43,14 +47,14 @@ We make use of two tools that are not specifically developed for scraping, but a
 [Requests](http://docs.python-requests.org/en/latest/) focuses on the task of interacting with web sites.
 It can download a web page's HTML given its URL.
 It can submit data as if filled out in a form on a web page.
-It manages cookies, keeping track of a logged-in session.
+It can manage cookies, keeping track of a logged-in session.
 And it helps handling cases where the web site is down or takes a long time to respond.
 
 [lxml](http://lxml.de) is a tool for working with HTML and XML documents, represented as an *element tree*.
 It evaluates XPath and CSS selectors to find matching elements.
 It facilitates navigating from one element to another.
 It facilitates extracting the text, attribute values or HTML for a particular element.
-It knows how to handle badly-formed HTML (such as with a tag that is never closed, or is never opened), although it may not handle it identically to a particular web browser.
+It knows how to handle badly-formed HTML (such as an opening tag that is never closed, or a closing tag that is never opened), although it may not handle it identically to a particular web browser.
 It is also able to construct new well-formed HTML/XML documents, element by element.
 
 To use CSS selectors, the [cssselect](https://pypi.python.org/pypi/cssselect) package must also be installed.
@@ -88,7 +92,7 @@ print(response.content)
 ~~~
 {: .python}
 
-You should see the same as what you would when using a web browser's View Source feature (albeit less colourful):
+You should see the same as what you would when using a web browser's _View Source_ feature (albeit less colourful):
 
 ```
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -105,26 +109,26 @@ What's it doing?
 
 * `import requests` has made the requests library available to your Python code.
 * `requests.get(URL)` tries to request the URL from the web server and returns a `Response` object which includes various details about the request and its response.
-* `response.text` reads all the content sent back by the web server (and raises and error if the request was unsuccessful), in this case HTML.
+* `response.text` reads all the content sent back by the web server (and raises an error if the request was unsuccessful), in this case HTML source code.
 
 We now have the page content, but as a string of textual characters, not as a tree of elements.
 
 ## Traversing elements in a page with lxml
 
-The following illustrates the `xpath` and `cssselect` methods provided on an ElementTree (and each Element thereof), as well as other tree traversal.
+The following illustrates loads the response HTML into a tree of elements, and illustrates the `xpath` and `cssselect` methods provided on an ElementTree (and each Element thereof), as well as other tree traversal.
 Running the following code:
 
 ~~~
 import requests
-from lxml import etree
+import lxml.etree
 
 response = requests.get('http://www.un.org/en/sc/documents/resolutions/2016.shtml')
-tree = etree.HTML(response.text)
+tree = lxml.etree.HTML(response.text)
 title_elem = tree.xpath('//title')[0]
 title_elem = tree.cssselect('title')[0]  # equivalent to previous XPath
 print("title tag:", title_elem.tag)
 print("title text:", title_elem.text)
-print("title html:", etree.tostring(title_elem))
+print("title html:", lxml.etree.tostring(title_elem))
 print("title tag:", title_elem.tag)
 print("title's parent's text:", title_elem.getparent().text)
 print("title's parent's tag:", title_elem.getparent().tag)
@@ -144,7 +148,7 @@ title's parent's tag: head
 ~~~
 {: .output}
 
-This code begins by building a tree of Elements from the HTML using `etree.HTML(some_html)`. It then illustrates some operations on the elements.
+This code begins by building a tree of Elements from the HTML using `lxml.etree.HTML(some_html)`. It then illustrates some operations on the elements.
 With some element, `elem`, or the tree:
 
 * `elem.xpath(some_path)` and `elem.cssselect(some_selector)` find a list of nodes relative to `elem` matching the given XPath or CSS selector expression, respectively.
@@ -153,10 +157,10 @@ With some element, `elem`, or the tree:
 * `elem.tag` is `elem`'s tag name.
 * `elem.text` is the text immediately under the node. (More on this below.)
 * `elem.attrib` is a dict of the attributes of `elem`.
-* `etree.tostring(elem)` translates the element back into HTML/XML.
+* `lxml.etree.tostring(elem)` translates the element back into HTML/XML.
 
-In the above example, we extract the first (and only) `<title>` element from the page, show its text, etc., and similar for its parent, the `<head>` node.
-When we print the text of that parent node, we see that it consists of two blank lines.
+In the above example, we extract the first (and only) `<title>` element from the page, show its text, etc., and do the same for its parent, the `<head>` node.
+When we print the text of that parent node, we see that it consists of two blank lines. Why?
 
 > ## Whose text is it anyway?
 > `tree.css('head')[0].text` will not include the title text despite the `<title>` node being inside the `<head>` node.
@@ -169,7 +173,9 @@ When we print the text of that parent node, we see that it consists of two blank
 >
 {: .callout}
 
-> ## Beautiful Soup, an alternative interface to lxml
+Apart from basic features of Python, these are all the tools we should need.
+
+> ## Beautiful Soup, an alternative library to access a tree of HTML elements
 > [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/)
 > (or bs4) provides similar functionality to lxml and is
 > commonly used for web scraping. It does not, however, support XPath.
@@ -179,20 +185,18 @@ When we print the text of that parent node, we see that it consists of two blank
 > of text).
 {: .callout}
 
-Apart from basic features of Python, these are all the tools we should need.
-
 # UNSC scraper overview
 
 Now that we have some idea of what requests and lxml do, let's use them to scrape UNSC data. 
-We will modularise our scraper as follows:
+We will modularise our scraper design as follows:
 
-1. A `get_year_urls` function will return a list of year URLs to scrape resolutions from
+1. A `get_year_urls` function will return a list of year URLs to scrape resolutions from.
 2. A function `get_resolutions_for_year` will return an object like `{'date': '1962', 'symbol': 'S/RES/174 (1962)', 'title': 'Admission of new Members to the UN: Jamaica', 'url': 'http://www.un.org/en/ga/search/view_doc.asp?symbol=S/RES/174(1962)'}` for each resolution at the given page URL.
-3. The scraper script will run `get_year_urls`, and then `get_resolutions_for_year` for each year and write the resolutions in CSV to the file `unsc-resolutions.csv`
+3. The scraper script will run `get_year_urls`, and then `get_resolutions_for_year` for each year and write the resolutions in CSV to the file `unsc-resolutions.csv`.
 
 # Spidering pages of UNSC resolutions
 
-We'll start by compiling a list of URLs to scrape. We will write a Python function called `get_year_urls`, which is to get the set of URLs listing resolutions, which we will scrape in turn.
+We'll start by compiling a list of URLs to scrape. We will write a Python function called `get_year_urls`. Its job is to get the set of URLs listing resolutions, which we will later scrape.
 
 For a start, the following function will extract and return a list of the URLs linked to from the starting page:
 
@@ -200,8 +204,8 @@ For a start, the following function will extract and return a list of the URLs l
 def get_year_urls():
     start_url = 'http://www.un.org/en/sc/documents/resolutions/'
     response = requests.get(start_url)
-    tree = etree.HTML(response.content)
-    links = tree.cssselect('a')  # or etree.xpath('//a')
+    tree = lxml.etree.HTML(response.content)
+    links = tree.cssselect('a')  # or tree.xpath('//a')
 
     out = []
     for link in links:
@@ -231,29 +235,31 @@ We are faced with two issues:
 
 > ## Dealing with relative URLs
 >
-> Most of the URLs are _relative_ to that page. We could
+> Most of the URLs found in `href` attributes are _relative_ to the page we found them in. We could
 > prefix all those URLs with `http://www.un.org/en/sc/documents/resolutions/`
 > to make them absolute, but that doesn't handle all the cases.
 > Since this is a common need, we can use an
 > existing function, `requests.compat.urljoin(base_url, relative_url)` which will translate:
 >
-> * `"#mainnav"` to `"http://www.un.org/en/sc/documents/resolutions/#mainnav"`
-> * `"2010.shtml"` to `"http://www.un.org/en/sc/documents/resolutions/2010.shtml"`
-> * `"/ar/sc/documents/resolutions/"` to `"http://www.un.org/ar/sc/documents/resolutions/"`
-> * `"http://www.un.org/en/index.html"` to `"http://www.un.org/en/index.html"` (unchanged)
+> | From relative URL                | To absolute URL                                           |
+> |----------------------------------|-----------------------------------------------------------|
+> | `#mainnav`                       | `http://www.un.org/en/sc/documents/resolutions/#mainnav`  |
+> | `2010.shtml`                     | `http://www.un.org/en/sc/documents/resolutions/2010.shtml`|
+> | `/ar/sc/documents/resolutions/`  | `http://www.un.org/ar/sc/documents/resolutions/`          |
+> | `http://www.un.org/en/index.html`| `http://www.un.org/en/index.html` (unchanged)             |
 >
-> Here, the `"base_url"` is something like `"http://www.un.org/en/sc/documents/resolutions/2010.shtml"` and the relative URL is something like `"#mainnav"`.
+> Here, the `base_url` is something like `"http://www.un.org/en/sc/documents/resolutions/2010.shtml"` and the relative URL is something like `"#mainnav"`.
 > However, beware: the base URL is not always identical to the URL you pass into `requests.get(url)` for two reasons:
 >
 > * When you got the URL it may have redirected you to a different page. URLs are therefore relative to the response URL, stored in `response.url`, rather than the request URL. For example, `requests.get("http://www.un.org/ar/sc/documents/resolutions").url` returns `"http://www.un.org/ar/sc/documents/resolutions/"`. Note that this subtly, but importantly, adds a `"/"` at the end.
-> * The HTML on a page can indicate that the base for its relative URLs is something else. That is, if `tree.xpath('//head/base@href')` returns something, you should use its first value as the base URL. This does not apply in our case because there is no `<base>` tag in the page we are scraping.
+> * The HTML on a page can indicate that the base for its relative URLs is something else. (See [W3Schools on `<base>`](https://www.w3schools.com/tags/tag_base.asp).) That is, if `tree.xpath('//head/base@href')` returns something, you should use its first value as the base URL. This does not apply in our case because there is no `<base>` tag in the page we are scraping.
 >
 > (A Python scraping framework, [Scrapy](https://scrapy.org/), recently introduced a way to avoid some of these pitfalls, using `response.follow`. This is not applicable when using `requests` and `lxml` directly.
 {: .callout}
 
 > ## Challenge: Get absolute URLs for year pages
 > 
-> Complete the `get_year_urls` function fixing the two issues listed above: it should resolve the relative URLs and only get URLs correspondign to yearly resolution listings.
+> Complete the `get_year_urls` by function fixing the two issues listed above: it should resolve the relative URLs and only get URLs corresponding to yearly resolution listings.
 >
 > > ## Solution
 > > We use a more specific CSS selector, along with `urljoin`:
@@ -264,7 +270,7 @@ We are faced with two issues:
 > >     """
 > >     start_url = 'http://www.un.org/en/sc/documents/resolutions/'
 > >     response = requests.get(start_url)
-> >     tree = etree.HTML(response.content)
+> >     tree = lxml.etree.HTML(response.content)
 > >     links = tree.cssselect('#content > table a')
 > > 
 > >     out = []
@@ -292,7 +298,7 @@ def get_year_urls():
     """
     start_url = 'http://www.un.org/en/sc/documents/resolutions/'
     response = requests.get(start_url)
-    tree = etree.HTML(response.content)
+    tree = lxml.etree.HTML(response.content)
     tables = tree.cssselect('#content > table')
     # Check you captured something and not more than you expected
     if len(tables) != 1:
@@ -320,15 +326,15 @@ In this implementation, we first extract the `<table>` element, roughly make sur
 
 It's a good idea to check you're getting the kind of data you expect, because:
 
-* If we get no tables (perhaps because the page wasn't retrieved correctly), then `tables[0]` will fail and the entire scraper will stop. In a large scraping operation, this could stop lots of work in progress.
-* If we get more tables than 1, we should review that we've got the right data. Maybe the web site's owners have changed how the page is structured and put some other part of the page in a table which our CSS selector then captures.
+* If we get no tables (perhaps because the page wasn't retrieved correctly), then `tables[0]` will fail, raising an error that stops the entire scraper. In a large scraping operation, this could halt lots of work in progress.
+* If we get more tables than 1, we should review that we've got the right data. Maybe the web site's owners have changed how the page is structured and put some other part of the page in a table which our CSS selector then inadvertently captures.
 * If we get no year URLs, then we've failed our task.
 
 Here we just use `print` output as a way to report if something went wrong.
 
 > ## Advanced challenge: Validate `year`
 > If the page changes and the year text is not a valid number, we'd like to know about that.
-> Write code that validates the year text as being a four-digit number, and does not add the year with the invalid text to `out`.
+> Write code that validates the year text as being a four-digit number, and does not add a year with invalid text to `out`.
 > 
 > > ## Solution
 > > Insert at the TODO above:
@@ -343,15 +349,16 @@ Here we just use `print` output as a way to report if something went wrong.
 
 > ## When the URLs to scrape can't be listed
 > Sometimes you can list the pages needed to be scraped in advance. Here we can just generate URLs for all years from 1946 until now.
+> Often building a scraper involves analysing the kinds of URLs on a web site and constructing a list of them programmatically.
 >
-> On the other hand, sometimes you cannot get all the URLs at once, for instance when you need to click a "next page" link (although sometimes these URLs can also be enumerated by identifying patterns in the next page URLs). This means you can't design your scraper with distinct "collect URLs" and "scrape each URL" phases. Instead you might add each URL to a queue for later processing. (A scraping framework like Scrapy manages this queuing for you.)
+> On the other hand, sometimes you cannot get all the URLs at once, for instance when you need to click a "next page" link (although sometimes these URLs can also be enumerated by identifying patterns in the next page URLs). This means you can't design your scraper with distinct "collect URLs" and "scrape each URL" phases. Instead you might _add each URL to a queue for later processing_. (A scraping framework like Scrapy manages this queuing for you.)
 {: .callout}
 
 We have a list of year pages to scrape. Now we need to scrape the resolutions off each year page.
 
 # Scraping a page of UNSC resolutions
 
-At the heart of `get_resolutions_for_year` is getting a record for each resolution that contains its details.
+At the heart of `get_resolutions_for_year` is getting a record (a row in the output CSV) for each resolution that contains its details.
 Looking at [2016](http://www.un.org/en/sc/documents/resolutions/2016.shtml), we want:
 
 * `symbol`: the text of the first column
@@ -377,7 +384,7 @@ We will take the last approach. Let's assume that the code for extracting `table
 
 ~~~
 import requests
-from lxml import etree
+import lxml.etree
 
 def inner_text(element):
     return ''.join(element.itertext())
@@ -390,7 +397,7 @@ def get_resolutions_for_year(year_url, year):
         {'date': ..., 'symbol': ..., 'url': ..., ''title': ..., }
     """
     response = requests.get(year_url)
-    tree = etree.HTML(response.content)
+    tree = lxml.etree.HTML(response.content)
     tables = tree.cssselect('#content > table')
     # Check you captured something and not more than you expected
     if len(tables) != 1:
@@ -425,12 +432,13 @@ We added:
 
 > ## Limit the number of URLs to scrape through while debugging
 >
+> Eventually, we want our scraper to apply its extraction to all pages of UNSC resolutions.
 > But while we're working through to the final code that will allow us
 > the extract the data we want from those pages, we only want to run it on one
 > or a few pages at a time.
 >
 > This will not only run faster and allow us to iterate more quickly between different
-> revisions of our code, it will also not burden the server too much while we're debugging.
+> revisions of our code. It will also not burden the server too much while we're debugging.
 > This is probably not such an issue for only tens of pages, but it's good
 > practice, as it can make a difference for larger scraping projects. If you are planning
 > to scrape a massive website with thousands of pages, it's better to start small. Other
@@ -491,9 +499,11 @@ This gets the first child of the row, i.e. its first cell, extracts its text, an
 {: .output}
 
 > ## Challenge: Identify two issues in that output
+> There are two problems in the output above. What are they?
+>
 > > ## Solution
 > > 1. The header has been included.
-> > 2. The symbols surprisingly have `" \r\n      "` in them.
+> > 2. The symbols surprisingly have `" \r\n      "` in them.
 > {: .solution}
 {: .challenge}
 
@@ -506,7 +516,7 @@ We can exclude the header with:
             # Assume that a row with 1 element is the header
             continue
 ~~~
-{: .output}
+{: .python}
 
 Another approach would be to replace `table.cssselect('tr')` with `table.cssselect('tr')[1:]` to ignore the first row returned by the selector.
 
@@ -547,7 +557,7 @@ Run this on 2016 and 1999 to check that the output is sensibly getting 'symbol' 
 >
 > The title text can be extracted like the other fields, except that it is sometimes the second and sometimes the third (but always the last) column. 
 >
-> Note that you can get the last element of a Python list with `[-1]`. The CSS selectors `:nth-last-child(1)` and `:nth-last-of-type(1)` fulfill a similar purpose.
+> Hint: You can get the last element of a Python list with `[-1]`. The CSS selectors `:nth-last-child(1)` and `:nth-last-of-type(1)` fulfill a similar purpose.
 >
 > > ## Solution
 > > ~~~
@@ -606,7 +616,8 @@ Run the above scraper. Does it print any output indicative of problems (or quirk
 Open the output in a spreadsheet program like Microsoft Excel. Can you identify any other quirks from the data?
 
 > ## Challenge: debug the issues
-> Your scraper might have reported:
+> Your scraper should have reported:
+>
 > * "Expected 1 link in the symbol column, got 0" in [2013](http://www.un.org/en/sc/documents/resolutions/2013.shtml);
 > * "Expected exactly 1 table, got 2" in [1964](http://www.un.org/en/sc/documents/resolutions/1964.shtml) and [1960](http://www.un.org/en/sc/documents/resolutions/1960.shtml); and
 > * "Expected some resolutions, got none" in [1959](http://www.un.org/en/sc/documents/resolutions/1964.shtml).
@@ -650,16 +661,16 @@ Open the output in a spreadsheet program like Microsoft Excel. Can you identify 
 > {: .solution}
 {: .challenge}
 
-In constructing this lesson, we identified several quirks in the data, where one year differed from another in surprising ways (and there may be more we have not identified!). We have discussed many of these, while some are avoided:
+In constructing this lesson, we identified several quirks in the data, where one year differed from another in surprising ways (and there may be more we have not identified!). We have discussed many of these:
 
 * In the [index page](http://www.un.org/en/sc/documents/resolutions/), most links to year pages have relative URLs like `1980.shtml`, but some are like `/en/sc/documents/resolutions/2015.shtml`. Without `urljoin` we could have easily made a mistake finding the page URLs.
 * Some years have a date column, while most do not.
 * One year has a header row, while others do not.
 * Two years duplicated the entire page's HTML. If we had not checked for the case of extracting multiple tables, we might only have noticed the issue from the data, perhaps by plotting the counts per year and seeing an outlying count in 1960, or by noticing duplicate records.
-* In some years, such as [2017](http://www.un.org/en/sc/documents/resolutions/), not all `<tr>` opening tags had a matching `</tr>` closing tag. At one time we also found an excess `</tr>`. Alternatives to lxml may behave differently with such errors. Python's `html.parser` simply ignored the rest of the page's content when it reached the excess `</tr>`, discarding resolutions from the scraper we had developed with `html.parser`.
-* White-space in the resolution symbols differed. We found: `"S/RES/1939  (2010)"` vs. `"S/RES/2025 (2011)"` vs. `"S/RES/2132\n    (2013)"`
+* In some years, such as [2017](http://www.un.org/en/sc/documents/resolutions/), not all `<tr>` opening tags have a matching `</tr>` closing tag. At one time we also found an excess `</tr>`. Alternatives to lxml may behave differently with such errors. Python's `html.parser` simply ignored the rest of the page's content when it reached the excess `</tr>`, discarding subsequent resolution data.
+* White-space in the resolution symbols differed. We found: `"S/RES/1939  (2010)"` vs. `"S/RES/2025 (2011)"` vs. `"S/RES/2132\n       (2013)"`
 
-These quirks are somewhat peculiar to manually-edited web sites. However, similar things can happen with database-backed automatic templating, where:
+These quirks are somewhat peculiar to manually-edited web sites. However, similar things can happen with database-backed web sites. For instance:
 
 * some fields may be absent, causing your XPath/CSS selectors to return empty or capture the wrong piece of data;
 * the HTML may differ for different categories of object (e.g. films vs. TV shows);

@@ -13,6 +13,7 @@ keypoints:
 - "Data that is relatively well structured (in a table) is relatively easily to scrape."
 - "More often than not, web scraping tools need to be told what to scrape."
 - "CSS selectors can be used to define what information to scrape, and how to structure it."
+- "CSS selectors in scrapers need to be designed careful, as the selector chosen for one page may not work perfectly on another."
 - "More advanced data cleaning operations are best done in a subsequent step."
 ---
 
@@ -101,9 +102,9 @@ Click _Sitemap (unsc-resolutions)_ to get the drop-down menu again, and _Selecto
 
 ## A selector for resolutions
 
-Clicking the `year` ID will take you to _its_ child selectors; there are none. It will not take you to an example year page, so you will have to click a year link yourself, say 2016, to design its child selectors as they only apply in the context of each year.
+Clicking the `year` ID will take you to _its_ child selectors, i.e. the things to scrape on every year page; there are none. Clicking `year` will _not_ take you to an example year page. But since its child selectors only apply in the context of each year page, you will have to click a year link yourself -- say, [2016](http://www.un.org/en/sc/documents/resolutions/2016.shtml) -- to design `year`'s child selectors.
 
-We will now create a selector which captures each element containing data for a single resolution, i.e. each selected item should be a row of the table.
+We will now create a selector which captures _each element containing data for a single resolution_, i.e. each selected item should be a row of the table.
 
 * id: `resolution`
 * type: Element
@@ -115,7 +116,7 @@ Note that here we want to select an *Element* type, as we want to be able to fur
 
 The selector for resolutions is, in this case, a bit tricky, for two reasons:
 
-1. Each resolution is presented in a table row `<tr>` element. The table title is also a row, but doesn't contain resolution data, so a simple expression like `<tr>` which captures all table rows will not suffice. We cannot use CSS2 Selectors to say that we'd only like rows containing more than one `<td>` cell (though we could do this kind of thing with XPath). We can, however, use CSS2 selectors to get all but the first using an advanced version of `:nth-child` or `:nth-of-type`.
+1. As you can see by inspecting the page source, each resolution is presented in a table row `<tr>` element. However: the table title is also a row, but doesn't contain resolution data! So a simple CSS selector like `tr` which captures all table rows will not suffice. We cannot use CSS2 Selectors to say that we'd only like rows containing more than one `<td>` cell (though we could do this kind of thing with XPath). We can, however, use CSS2 selectors to get all but the first using an advanced `:nth-child` or `:nth-of-type` selector.
 2. We want each selected element to contain *all* the data for a single resolution, not just its title, for instance. Using the visual _Select_ tool, it is hard to select a row in entirety, as clicking anywhere in a table will select a cell `<td>` element or something within it, rather than the row as a whole. To facilitate selecting the whole row, the _Select_ tool has a feature where pressing **P** on your keyboard will change the proposed selector so that it selects the _parents_ of the currently selected elements. So if you select a cell from the table and hit **P** it should select the row.
 
 > ## Challenge: Construct a selector to get all resolution rows
@@ -195,7 +196,7 @@ Then click Data Preview on the `resolution` row to see the following:
 > We feel that some of this interface is quite unintuitive. If you have specific constructive critique for how the Web Scraper tool can be improved, you should:
 > * Look at the [list of issues](https://github.com/martinsbalodis/web-scraper-chrome-extension/issues) for the project and search through it to see if a similar suggestion has already been made. Perhaps use a GitHub account to indicate your support for that suggestion.
 > * [Create a new issue](https://github.com/martinsbalodis/web-scraper-chrome-extension/issues/new) to suggest a change or highlight a problem.
-> * Consider assisting in the development in the extension, if you have sufficient experience with the technologies used (JavaScript, HTML, CSS, etc.).
+> * Consider assisting in the development of the extension, if you have sufficient experience with the technologies used (JavaScript, HTML, CSS, etc.).
 {: .callout}
 
 ## More data previews and some fixes
@@ -204,21 +205,31 @@ Inspecting the Data Preview on `resolution` again, things look okay.
 
 ![Complete resolution data preview for 2016]({{page.root}}/fig/web-scraper-data-preview2.png)
 
-Or at least they do for 2016. If we go to [1999](http://www.un.org/en/sc/documents/resolutions/1999.shtml) where we note that the date column doesn't exist, the `resolution` Data Preview shows us some issues.
+Or at least they do for 2016.
 
-![Broken resolution data preview for 1999]({{page.root}}/fig/web-scraper-data-preview-1999bad.png)
+> ## Challenge: using Data Preview to identify this scraper's failures
+> Now run the Data Preview on the page for [1999](http://www.un.org/en/sc/documents/resolutions/1999.shtml).
+> There the date column does not exist. What does the scraper get wrong?
+>
+> > ## Solution
+> > We note that the date column doesn't exist, the `resolution` Data Preview shows us some issues.
+> > ![Broken resolution data preview for 1999]({{page.root}}/fig/web-scraper-data-preview-1999bad.png)
+> > 
+> > * `date` is filled with titles
+> > * `title` is filled with `null`
+> > * `url` doesn't have `http://...` at the front
+> {: .solution}
+{: .challenge}
 
-* `date` is filled with titles
-* `title` is filled with `null`
-* `url` doesn't have `http://...` at the front
+A visual scraper may help you build the CSS selector for a set of elements on a page, but that CSS selector might not be the best match for *all* pages you wish to scrape. (But most web sites aren't this quirky, either!)
 
-We need to get a bit creative and use advanced techniques to fix some of these up. By and large, we have identified something which visual scraping handles poorly: variation in the page structure. This may motivate having more control over your scraper by coding it up as we will in the next episode.
+We need to get a bit creative and use advanced techniques to handle pages with and without a date column, and the variation in URL format. Visual scraping may handle variation in the page structure poorly, which motivates having more control over your scraper by coding it up as we will in the next episode.
 
-For the `title` we can change the selector from `td:nth-of-type(3)` to `td:nth-last-of-type(1)`, as it is always the last column.
+Possible solutions using the Web Scraper extension:
 
-We can more-or-less fix the `url` issue by telling Web Scraper to extract `symbol` as as Link (not a Text) with the `a` selector and this will extract the full, resolved URL of the link as well as the link text, in two separate columns of the extracted data. We can then delete the `url` selector.
-
-And we can fix (hackily!) the `date` issue by requiring that the date text have a certain form. We can use regular expressions: enter `^[0-9].*[0-9]$`. This matches only text which begins with a digit and ends with a digit. Hopefully (but we can only hope) this will not match any titles.
+* We can more-or-less fix the `url` issue by telling Web Scraper to extract `symbol` as as Link (not a Text) with the `a` selector. This will extract the full (resolved) URL of the link as well as the link text, in two separate columns of the extracted data. We can then delete the `url` selector.
+* For the `title` we can change the selector from `td:nth-of-type(3)` to `td:nth-last-of-type(1)`, as it is always the *last* column but not always the third.
+* And we can fix (hackily!) the `date` issue by requiring that the date text have a certain form. We can use regular expressions: enter `^[0-9].*[0-9]$` in the _Regex_ field. This matches only text which begins with a digit and ends with a digit. Hopefully (but we should check after the fact) this will not match any titles.
 
 ## Run it!
 
@@ -230,7 +241,7 @@ It should be possible to _Browse_ (under _Scrape_ in the drop-down menu) the dat
 
 You can also save a machine readable copy of your scraper details by selecting _Export Sitemap_ and copying the code there to a file.
 
-When it is finished, _Export data as CSV_ and view the data in spreadsheet software such as Excel or Google Sheets. (We do not yet know of a way to make the Web Scraper extension only do part of a scrape!)
+When it is finished, _Export data as CSV_ and view the data in spreadsheet software such as Excel or Google Sheets.
 
 
 > ## Extension challenge: count how many resolutions there are per year
@@ -240,6 +251,7 @@ When it is finished, _Export data as CSV_ and view the data in spreadsheet softw
 > > ## Solution
 > > Here is a bar chart of resolutions by year constructed from a pivot table in Excel:
 > > ![Bar chart of resolutions by year]({{page.root}}/fig/web-scraper-unsc-bar-chart.png)
+> >
 > > Apart from the general increase in the rate of resolutions produced in the 1990s, 1960 stands out as an outlier. It turns out that our data has duplicate records in it. We will discuss this in the next episode.
 > {: .solution}
 {: .challenge}
