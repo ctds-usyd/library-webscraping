@@ -7,12 +7,12 @@ questions:
 - "How can I use CSS selectors to precisely select what data to scrape?"
 objectives:
 - "Introduce the Chrome Web Scraper extension."
-- "Practice scraping data that is well structured."
-- "Use XPath queries to refine what needs to be scraped when data is less structured."
+- "Practice scraping data that is largely well structured, merging data from many pages."
+- "Use CSS selectors to refine what needs to be scraped when data is less structured."
 keypoints:
 - "Data that is relatively well structured (in a table) is relatively easily to scrape."
 - "More often than not, web scraping tools need to be told what to scrape."
-- "XPath can be used to define what information to scrape, and how to structure it."
+- "CSS selectors can be used to define what information to scrape, and how to structure it."
 - "More advanced data cleaning operations are best done in a subsequent step."
 ---
 
@@ -24,13 +24,15 @@ Visual scraping tools vary in how flexible they are (in comparison to the full e
 Many visual scrapers require you to pay for their services beyond a small number of trial extractions, may only store your data for a limited time, and may not provide a way for you to take your scraper off their site for reuse or extension.
 Some do not allow you to write your own XPath / CSS / regular expression selectors; some only support CSS or XPath but not the other.
 
-In designing this lesson, we have chosen to emphasise free solutions that give you ultimate control of the scraper and its data.
-As of June 2017, we have only found a few visual scraping tools that are [Free Open-Source Software](https://en.wikipedia.org/wiki/Free_and_open-source_software), including [webscraper.io's Web Scraper Chrome extension](http://webscraper.io/), [David Heaton's Scraper Chrome extension](https://github.com/mnmldave/scraper) and [Portia](https://scrapinghub.com/portia/).
-While there are numerous advantages to Portia, we found it relatively difficult to install and ran into bugs (though it calls itself a Beta, so bugs are to be expected).
-Scraper is limited to extracting data from a single page, and also had some issues when we tested it.
-In comparison to refined commercial tools, Web Scraper's user experience leaves much to be desired, but it is a flexible tool (although it does not support XPath) and a useful introduction to scraping without coding.
+> ## Why we chose the Web Scraper extension
+> In designing this lesson, we have chosen to emphasise free solutions that give you ultimate control of the scraper and its data.
+> As of June 2017, we have only found a few visual scraping tools that are [Free Open-Source Software](https://en.wikipedia.org/wiki/Free_and_open-source_software), including [webscraper.io's Web Scraper Chrome extension](http://webscraper.io/), [David Heaton's Scraper Chrome extension](https://github.com/mnmldave/scraper) and [Portia](https://scrapinghub.com/portia/).
+> While there are numerous advantages to Portia, we found it relatively difficult to install and ran into bugs (though it calls itself a Beta, so bugs are to be expected).
+> Scraper is limited to extracting data from a single page, and also had some issues when we tested it.
+> In comparison to refined commercial tools, Web Scraper's user experience leaves much to be desired, but it is a flexible tool (although it does not support XPath) and a useful introduction to scraping without coding.
+{: .callout}
 
-See [Setup]({{page.root}}/Setup) for instructions on installing the browser extension.
+See [Setup]({{page.root}}/Setup) for instructions on installing the Web Scraper browser extension.
 
 # Using the Web Scraper Chrome extension
 
@@ -52,7 +54,7 @@ Before we start constructing the sitemap, let's try to understand the structure 
 A Web Scraper sitemap consists of a collection of selectors each of which may identify:
 
 * specific content to extract;
-* elements of the page containing content to extract (e.g. a result in a list of search results, each of which contains multiple specific pieces of content, like title, URL and summary); or
+* elements of the page containing content to extract (e.g. an entry in a catalogue, each of which contains multiple specific pieces of content, like model, brand, price, etc.); or
 * a link to follow and continue scraping from.
 
 Each selector (except a special one called `_root`) has a parent selector defining the context in which each selector is to be applied. For example, the following shows a visual representation ("Selector graph") of the final scraper we will build for the UNSC resolutions:
@@ -71,11 +73,11 @@ At this point, we have the Web Scraper tool open at the `_root` with an empty li
 
 Click _Add new selector_. We will add the selector that takes us from the index to each year page. Let's give it the id `year`. Its type is _Link_. We want to get multiple year links from the root, so we will check the Multiple box below.
 
-Under _Selector_, have tools for building a CSS selector. Rightmost (highlighted blue below) is a text box where we can enter a CSS selector. The _Select_ button gives us a tool for visually selecting elements on the page to construct a CSS selector. _Element Preview_ highlights on the page those elements that would be selected by the specified selector. _Data Preview_ pops up a sample of the data that would be extracted by the specified selector.
+Under _Selector_, there are tools for building a CSS selector. Rightmost (highlighted blue below) is a text box where we can enter a CSS selector. The _Select_ button gives us a tool for visually selecting elements on the page to construct a CSS selector. _Element Preview_ highlights on the page those elements that would be selected by the specified selector. _Data Preview_ pops up a sample of the data that would be extracted by the specified selector.
 
 ![Adding a year selector]({{ page.root }}/fig/web-scraper-year-selector.png)
 
-Let's start by entering the selector `a`, which will match all `<a>` (hyperlink) elements in the page. Click _Element Preview_ and all links in the page you are viewing will blush. (You must be talking about them!) Click _Data Preview_ and we'll see that from the set of links we can construct a table consisting of the text and the link URL (plus a couple of administrative details).
+Let's start by entering the selector `a`, which will match all `<a>` (hyperlink) elements in the page. Click _Element Preview_ and all links in the page you are viewing will blush. (You must be talking about them!) Click _Data Preview_ and we'll see that from the set of links we can scrape a table consisting of the text and the link URL (plus a couple of administrative details).
 
 We only want to capture year links, not all links, in the page. We could construct the CSS selector by inspecting the page's source or element tree. Instead we will use Web Scraper's _Select_ feature.
 

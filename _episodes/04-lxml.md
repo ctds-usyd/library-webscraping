@@ -248,7 +248,7 @@ We are faced with two issues:
 > * When you got the URL it may have redirected you to a different page. URLs are therefore relative to the response URL, stored in `response.url`, rather than the request URL. For example, `requests.get("http://www.un.org/ar/sc/documents/resolutions").url` returns `"http://www.un.org/ar/sc/documents/resolutions/"`. Note that this subtly, but importantly, adds a `"/"` at the end.
 > * The HTML on a page can indicate that the base for its relative URLs is something else. That is, if `tree.xpath('//head/base@href')` returns something, you should use its first value as the base URL. This does not apply in our case because there is no `<base>` tag in the page we are scraping.
 >
-> (The Python scraping framework, Scrapy, recently introduced a way to avoid some of these pitfalls, using `response.follow`. This is not applicable when using `requests` and `lxml` directly.
+> (A Python scraping framework, [Scrapy](https://scrapy.org/), recently introduced a way to avoid some of these pitfalls, using `response.follow`. This is not applicable when using `requests` and `lxml` directly.
 {: .callout}
 
 > ## Challenge: Get absolute URLs for year pages
@@ -732,7 +732,6 @@ Aside from ethical questions addressed in the next episode, below are a number o
 * __Running the scraper on the cloud__:
   You may not want to leave your own computer on to scrape. It may take resources away from your work, for instance. Commercial scrapers offer to run your scraper on their machines. A free alternative is [morph.io](http://morph.io) which offers to host your open-source scraper in the cloud and return the data to you.
 * __Alternative output formats__: Some structures of information are not suitable to put into a table; others are too big to store in a single table. Scraping frameworks may support storing the scraped data in a database or some other structure.
-* __User-Agent spoofing__: TODO
 * __Data only accessible through interaction__: Sometimes a web site requires logging in, or you only get access to the data by clicking on or scrolling down the page.  While particular cases may be engineered with a traditional `requests`-based scraper, an alternative is to employ a _web driver_. This is a web browser that is controlled by a program instead of a human, and will naturally run scripts associated with a web page, but can also do things like clicking, scrolling, etc. Emulating a human's interactions can give your scraper access to everything a human can get. The [Web Scraping Sandbox, toscrape.com](http://toscrape.com/) includes several variants of the same artificial web site, including with login forms and "infinite scroll"s that require this kind of scraper. Challenge yourself to scraping the data on that site!
 
 > ## So why didn't we learn Scrapy?

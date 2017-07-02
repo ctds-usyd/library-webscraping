@@ -1,7 +1,7 @@
 ---
 title: "Selecting content on a web page with CSS selectors"
-teaching: 30
-exercises: 15
+teaching: 25
+exercises: 20
 questions:
 - "How can I select a specific element on web page?"
 - "What is a CSS Selector and how can I use it?"
@@ -212,9 +212,9 @@ Note that _C_ can be an arbitrarily complex selector, perhaps combining many bas
 > | `Address`                              | Yes                      |
 > | `catfood address`                      | Yes                      |
 > | `catfood[type=basic] address`          | Yes                      |
-> | `catfood[type="basic"] address`        | Yes                      |
-> | `catfood[type=premium] address`        | No                       |
 > | `catfood[type=BASIC] address`          | No!                      |
+> | `catfood[type=premium] address`        | No                       |
+> | `catfood[type="basic"] address`        | Yes                      |
 > | `catfood > address`                    | No                       |
 > | `catfood > * > address`                | Yes                      |
 > | `catfood > :nth-child(2) > address`    | Yes                      |
@@ -506,6 +506,7 @@ combinators to get from those easy-to-identify elements to the target elements.
 > Tips:
 >
 > * The syntax to select the siblings of context elements is `context + target`
+> * Since you don't have any basic selector attributes for the target, you might use the universal selector (`*`)
 >
 > > ## Solution
 > > Let's have a look at the HTML code of this page, around this challenge box (using the "View Source" or "Inspect Element" option)
@@ -554,7 +555,7 @@ combinators to get from those easy-to-identify elements to the target elements.
 > > | `#...`| Find by ID (anywhere in the document)... |
 > > | `+ *`| Get all the siblings of the preceding context |
 > >
-> > By hovering on the object returned by your XPath query in the console, your browser may helpfully highlight
+> > By hovering your mouse cursor over the object returned by your query in the console, your browser may helpfully highlight
 > > that object in the document, enabling you to make sure you got the right one:
 > >
 > > ![Hovering over a resulting node in Firefox]({{ page.root }}/fig/firefox-hover.png)
