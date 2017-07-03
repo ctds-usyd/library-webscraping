@@ -1,13 +1,18 @@
 ---
 layout: lesson
 root: .
+collaborative_notes: "http://pad.software-carpentry.org/2017-07-03-lc-webscraping"            # optional: URL for the workshop collaborative notes, e.g. an Etherpad or Google Docs document
 ---
 
 > **ResBaz Sydney 2017**
 >
+> This page: **[https://tinyurl.com/resbaz17-scrape](https://tinyurl.com/resbaz17-scrape)**
+>
 > Instructor: Joel Nothman
 >
 > Helpers: Anushi Shah and Nikzad Babaii Rizvandi
+>
+> [Etherpad for collaborative note-taking]({{page.collaborative_notes}})
 
 Web scraping is the process of extracting data from websites. Some data that is available on the web is
 presented in a format that makes it easier to collect and use it, for example in the form of downloadable
