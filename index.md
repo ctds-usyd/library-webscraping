@@ -3,6 +3,12 @@ layout: lesson
 root: .
 ---
 
+> **ResBaz Sydney 2017**
+>
+> Instructor: Joel Nothman
+>
+> Helpers: Anushi Shah and Nikzad Babaii Rizvandi
+
 Web scraping is the process of extracting data from websites. Some data that is available on the web is
 presented in a format that makes it easier to collect and use it, for example in the form of downloadable
 comma-separated values (CSV) datasets that can then be imported in a spreadsheet or loaded into a data analysis
@@ -17,7 +23,6 @@ to automate this process by defining what sites to visit, what information to lo
 should stop at the end of a page or follow hyperlinks to repeat the process recursively.
 Automating web scraping also allows for defining whether the process should be run at regular intervals in order to capture changes
 in the data.
-
 
 > ## Prerequisites
 >
