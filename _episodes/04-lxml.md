@@ -586,7 +586,7 @@ with open('unsc-resolutions.csv', 'w') as out_file:
 
     # Loop over years
     for year_url, year in get_year_urls():
-        time.sleep(0.05)  # Wait a moment
+        time.sleep(0.1)  # Wait a moment
 
         print('Processing:', year_url)
         year_resolutions = get_resolutions_for_year(year_url, year)
@@ -602,7 +602,7 @@ Some explanation:
 * `csv.DictWriter(...)` constructs a writer which converts dicts with the specified fields to a comma-delimited table (CSV) and writes it to `out_file`.
 * `writer.writeheader()` writes the line `date,symbol,title,url` at the top of the CSV.
 * `for year_url, ...` begins to iterate over the year URLs acquired from `get_year_urls()`.
-* `time.sleep(0.05)` instructs Python to wait for 5% of a second before downloading the next page. This helps to avoid placing too much strain on the `www.un.org` web server.
+* `time.sleep(0.1)` instructs Python to wait for 10% of a second before downloading the next page. This helps to avoid placing too much strain on the `www.un.org` web server.
 * `print('Processing', ...)` tells you which year the scraper is scraping. It is very valuable to have this knowledge when you need to work out why some other error message was printed.
 * `year_resolutions = ...` gets the resolutions for the current year in the loop.
 * `writer.writerow(resolution)` converts the resolution to a line of CSV and outputs it.
@@ -611,9 +611,9 @@ You have a full scraper. But does it perfectly capture the data?
 
 ## Quirks and quality assurance
 
-Run the above scraper. Does it print any output indicative of problems (or quirks) in the web site?
+Run the above scraper. Do our `print` statements highlight any quirks in the web site?
 
-Open the output in a spreadsheet program like Microsoft Excel. Can you identify any other quirks from the data?
+Open the output (`unsc-resolutions.csv`) in a spreadsheet program like Microsoft Excel. Can you identify any other quirks from the data?
 
 > ## Challenge: debug the issues
 > Your scraper should have reported:
@@ -622,11 +622,11 @@ Open the output in a spreadsheet program like Microsoft Excel. Can you identify 
 > * "Expected exactly 1 table, got 2" in [1964](http://www.un.org/en/sc/documents/resolutions/1964.shtml) and [1960](http://www.un.org/en/sc/documents/resolutions/1960.shtml); and
 > * "Expected some resolutions, got none" in [1959](http://www.un.org/en/sc/documents/resolutions/1964.shtml).
 >
-> View those pages (you should not need to view the source) to identify the associated issues.
+> View those pages (you should not need to view the source) to identify the associated issues: how are those pages different from the ones you initially designed your scraper for?
 > Then fix the scraper to get the complete, clean dataset.
 >
 > > ## Solution
-> > 1. 2013 has a header row above the data. Because we skip the row when there is no link in it, this issue is already handled and the data is clean. We could modify our scraper to silence the error in this year:
+> > 1. 2013 has a header row above the data. Because our scraper already skips the row when there is no link in it, the data is clean. We could modify our scraper to silence the error in this year:
 > >    ~~~
 > >    if len(symbol_links) != 1:
 > >        if year != '2013':
@@ -665,12 +665,12 @@ In constructing this lesson, we identified several quirks in the data, where one
 
 * In the [index page](http://www.un.org/en/sc/documents/resolutions/), most links to year pages have relative URLs like `1980.shtml`, but some are like `/en/sc/documents/resolutions/2015.shtml`. Without `urljoin` we could have easily made a mistake finding the page URLs.
 * Some years have a date column, while most do not.
-* One year has a header row, while others do not.
-* Two years duplicated the entire page's HTML. If we had not checked for the case of extracting multiple tables, we might only have noticed the issue from the data, perhaps by plotting the counts per year and seeing an outlying count in 1960, or by noticing duplicate records.
+* One year has a header row, giving names describing each column, while others do not.
+* Two years duplicate the entire page's HTML. If we had not checked for the case of extracting multiple tables, we might only have noticed the issue from the data, perhaps by plotting the counts per year and seeing an outlying count in 1960, or by noticing duplicate records.
 * In some years, such as [2017](http://www.un.org/en/sc/documents/resolutions/), not all `<tr>` opening tags have a matching `</tr>` closing tag. At one time we also found an excess `</tr>`. Alternatives to lxml may behave differently with such errors. Python's `html.parser` simply ignored the rest of the page's content when it reached the excess `</tr>`, discarding subsequent resolution data.
-* White-space in the resolution symbols differed. We found: `"S/RES/1939  (2010)"` vs. `"S/RES/2025 (2011)"` vs. `"S/RES/2132\n       (2013)"`
+* White-space in the resolution symbols differs from year to year. We found: `"S/RES/1939  (2010)"` vs. `"S/RES/2025 (2011)"` vs. `"S/RES/2132\n       (2013)"`
 
-These quirks are somewhat peculiar to manually-edited web sites. However, similar things can happen with database-backed web sites. For instance:
+These quirks are somewhat peculiar to web sites that are _manually edited_. However, similar things can happen with database-backed web sites. For instance:
 
 * some fields may be absent, causing your XPath/CSS selectors to return empty or capture the wrong piece of data;
 * the HTML may differ for different categories of object (e.g. films vs. TV shows);
@@ -679,9 +679,10 @@ These quirks are somewhat peculiar to manually-edited web sites. However, simila
 * the web site may return an error page, or may identify your scraper as malicious and refuse to continue serving you content.
 
 > ## Tips for quirk resilience
+> Here are some tips about how you could ensure that your scraper will work despite variation.
 > 
 > 1. Look at your scraped data. Look at it more closely. Look at random samples collected over time. Perhaps analyse it in a tool like OpenRefine which will show you the number of distinct/duplicated values in each column. If you are scraping data over a long time, keep a dashboard of diagnostic measures to show you how many fields come back blank, for instance.
-> 2. Think about cases where your scraper might fail and apprehend them in code. Validate the extractions in your code. When something differs from expectation, output an informative message onto a log. Make sure the log includes enough information about the context, e.g. which page or part of the page you are scraping at the time.
+> 2. Think about cases where your scraper might fail, and apprehend them in code. Validate the extractions in your code. When something differs from expectation, output an informative message onto a log. Make sure the log includes enough information about the context, e.g. which page or part of the page you are scraping at the time.
 > 3. Only allow an error to halt your scraping operation if that's really necessary, by wrapping your main scraper code in an exception handler. For example:
 >    ~~~
 >            print('Processing:', year_url)
@@ -695,7 +696,7 @@ These quirks are somewhat peculiar to manually-edited web sites. However, simila
 >                continue  # skip to the next year
 >    ~~~
 >    {: .python}
->    This may be a last resort precaution as it will not output anything for the year, even if part of it was scraped successfully.
+>    Consider this a last resort: if an error occurs, any resolutions scraped from the error year will not be output.
 > 4. Write helper functions to make cleaning and error identification easy for you. `inner_text` is one example. Another useful helper might be:
 >    ~~~
 >    def extract_one(list_of_extractions, default=None):
@@ -709,13 +710,24 @@ These quirks are somewhat peculiar to manually-edited web sites. However, simila
 >    {: python}
 >    As well as alerting you to more than one extraction, this avoids triggering an error if your `cssselect` or `xpath` query returns an empty list.
 > 
-> A specialised framework like Scrapy helps manage tasks like logging, diagnostics, and handling empty lists.
+> A specialised framework like Scrapy helps manage tasks like logging, diagnostics, and handling empty lists of extractions.
 {: .callout}
 
 ## Using the data
 
-TODO: plot resolution count by year, etc.
-
+> ## Challenge: Analyse the data
+>
+> Perform some interesting analysis of the data, for instance:
+>
+> * Plot the number of resolutions per year. Are there interesting periods of increase or lull?
+> * Count how often each title occurs.
+> * Identify which words are most frequent in the titles.
+> * Plot only those resolutions that pertain to membership vs those that do not.
+> * Plot only those resolutions mentioning some country of choice (e.g. Israel or Pakistan) in their title.
+> * Very advanced: lookup strings of capitalised words (optionally including lowercase words like "of" and "for") in the Wikipedia or Wikidata API to associate the names with locations. Plot them on a map!
+>
+> A Pivot Table will be very useful for performing these analyses in Excel or Google Sheets. Similar functionality is provided in Python by [Pandas](http://pandas.pydata.org) and its `pivot` and `groupby` functionality.
+{: .challenge}
 
 > ## Extension challenge: multilingual UNSC resolutions
 > Run the scraper on resolutions in Arabic (start at http://www.un.org/ar/sc/documents/resolutions/) or Chinese (start at http://www.un.org/zh/sc/documents/resolutions/) and merge the results with English to have columns `en_title`, `ar_title`, etc.
