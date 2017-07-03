@@ -154,7 +154,7 @@ Here are some examples of the sort of things one can express with CSS selectors 
 |----------------------|----------------------------|-------------|
 | `address`            | `//address`                | Get every `address` element (and its contents) in the document |
 | `catfood address`    | `//catfood//address`       | Get every `address` element somewhere inside a `catfood` element |
-| `catfood[type=basic]`| `//catfood[@type='basic']` | Get every `catfood` element that has a `type` element with value "basic" |
+| `catfood[type=basic]`| `//catfood[@type='basic']` | Get every `catfood` element that has a `type` attribute with value "basic" |
 
 CSS selectors can only retrieve element nodes. Text and attributes need to be extracted outside of the CSS selector expression.
 
