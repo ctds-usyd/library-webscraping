@@ -29,7 +29,7 @@ Optional (already provided with Anaconda):
 
 * [Python 3.x](#python)
 * [Spyder 3](#spyder)
-* [lxml](#lxml)
+* [lxml](#lxml): a recent version
 * [cssselect](#cssselect)
 * [Requests](#reqeusts)
 

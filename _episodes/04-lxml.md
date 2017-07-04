@@ -18,7 +18,7 @@ keypoints:
 - "`requests` is a Python library that helps downloading web pages, primarily with `requests.get`."
 - "`requests.compat.urljoin(response.url, href)` may be used to resolve a relative URL `href`."
 - "`lxml` is a Python library that parses HTML/XML and evaluates XPath/CSS selectors."
-- "`lxml.etree.HTML(page_source)` will produce an element tree from some HTML code."
+- "`lxml.html.fromstring(page_source)` will produce an element tree from some HTML code."
 - "An element tree's `cssseelct` and `xpath` methods extract elements of interest."
 - "A scraper can be divided into: identifying the set of URLs to scrape; extracting some elements from a page; and transforming them into a useful output format."
 - "It is important but challenging to be resilient to variation in page structure: one should automatically validate and manually inspect their extractions."
@@ -88,7 +88,7 @@ Let's start by downloading the page of UNSC resolutions for 2016.  Enter the fol
 import requests
 
 response = requests.get('http://www.un.org/en/sc/documents/resolutions/2016.shtml')
-print(response.content)
+print(response.text)
 ~~~
 {: .python}
 
@@ -120,17 +120,16 @@ Running the following code:
 
 ~~~
 import requests
-import lxml.etree
+import lxml.html
 
 response = requests.get('http://www.un.org/en/sc/documents/resolutions/2016.shtml')
-tree = lxml.etree.HTML(response.text)
+tree = lxml.html.HTML(response.text)
 title_elem = tree.xpath('//title')[0]
 title_elem = tree.cssselect('title')[0]  # equivalent to previous XPath
 print("title tag:", title_elem.tag)
-print("title text:", title_elem.text)
-print("title html:", lxml.etree.tostring(title_elem))
+print("title text:", title_elem.text_content())
+print("title html:", lxml.html.tostring(title_elem))
 print("title tag:", title_elem.tag)
-print("title's parent's text:", title_elem.getparent().text)
 print("title's parent's tag:", title_elem.getparent().tag)
 ~~~
 {: .python}
@@ -142,36 +141,23 @@ title tag: title
 title text: Resolutions adopted by the United Nations Security Council in 2016
 title html: b'<title>Resolutions adopted by the United Nations Security Council in 2016</title>&#13;\n'
 title tag: title
-title's parent's text:
-
 title's parent's tag: head
 ~~~
 {: .output}
 
-This code begins by building a tree of Elements from the HTML using `lxml.etree.HTML(some_html)`. It then illustrates some operations on the elements.
+This code begins by building a tree of Elements from the HTML using `lxml.html.fromstring(some_html)`. It then illustrates some operations on the elements.
 With some element, `elem`, or the tree:
 
 * `elem.xpath(some_path)` and `elem.cssselect(some_selector)` find a list of nodes relative to `elem` matching the given XPath or CSS selector expression, respectively.
 * `elem.getparent()` gets the parent element of `elem`. Similarly, `elem.getprevious()` and `elem.getnext()` may return a single element, or None.
 * `elem.getchildren()` gets a list of the children of `elem`, while `elem.getiterator()` allows for iterating over all the descendants of `elem`. (Not illustrated above.)
 * `elem.tag` is `elem`'s tag name.
-* `elem.text` is the text immediately under the node. (More on this below.)
+* `elem.text_content()` gets the text of an element and all of its children
 * `elem.attrib` is a dict of the attributes of `elem`.
-* `lxml.etree.tostring(elem)` translates the element back into HTML/XML.
+* `lxml.html.tostring(elem)` translates the element back into HTML/XML.
 
 In the above example, we extract the first (and only) `<title>` element from the page, show its text, etc., and do the same for its parent, the `<head>` node.
 When we print the text of that parent node, we see that it consists of two blank lines. Why?
-
-> ## Whose text is it anyway?
-> `tree.css('head')[0].text` will not include the title text despite the `<title>` node being inside the `<head>` node.
->
-> In lxml.etree, `elem.text` only provides the text *immediately following an element's opening tag*.
-> `elem.tail` provides the text immediately following an element's closing tag.
-> 
-> To get the text contained by an element and all its descendants, you can use `elem.itertext()`.
-> In particular, `''.join(elem.itertext())` will join together all the fragments of text found in `elem` and its descendants into a single string of text.
->
-{: .callout}
 
 Apart from basic features of Python, these are all the tools we should need.
 
@@ -204,7 +190,7 @@ For a start, the following function will extract and return a list of the URLs l
 def get_year_urls():
     start_url = 'http://www.un.org/en/sc/documents/resolutions/'
     response = requests.get(start_url)
-    tree = lxml.etree.HTML(response.content)
+    tree = lxml.html.fromstring(response.text)
     links = tree.cssselect('a')  # or tree.xpath('//a')
 
     out = []
@@ -270,7 +256,7 @@ We are faced with two issues:
 > >     """
 > >     start_url = 'http://www.un.org/en/sc/documents/resolutions/'
 > >     response = requests.get(start_url)
-> >     tree = lxml.etree.HTML(response.content)
+> >     tree = lxml.html.fromstring(response.text)
 > >     links = tree.cssselect('#content > table a')
 > > 
 > >     out = []
@@ -290,7 +276,7 @@ We are faced with two issues:
 > {: .solution}
 {: .challenge}
 
-In the final version of `get_year_urls`, we make a couple of modifications, to ensure we're getting what we want, and to return the year number along with the URL (by getting it from `link.text`):
+In the final version of `get_year_urls`, we make a couple of modifications, to ensure we're getting what we want, and to return the year number along with the URL (by getting it from `link.text_content()`):
 
 ~~~
 def get_year_urls():
@@ -298,7 +284,7 @@ def get_year_urls():
     """
     start_url = 'http://www.un.org/en/sc/documents/resolutions/'
     response = requests.get(start_url)
-    tree = lxml.etree.HTML(response.content)
+    tree = lxml.html.fromstring(response.text)
     tables = tree.cssselect('#content > table')
     # Check you captured something and not more than you expected
     if len(tables) != 1:
@@ -311,7 +297,7 @@ def get_year_urls():
     out = []
     for link in links:
         year_url = urljoin(base_url, link.attrib['href'])
-        year = link.text
+        year = link.text_content()
         # TODO: validate that year is actually an appropriate number
         out.append((year_url, year))
 
@@ -340,7 +326,7 @@ Here we just use `print` output as a way to report if something went wrong.
 > > Insert at the TODO above:
 > > ~~~
 > > if len(year) != 4 or not year.isdigit():
-> >     print("Link text '{}' is not an integer".format(link.text))
+> >     print("Link text '{}' is not an integer".format(link.text_content()))
 > >     continue
 > > ~~~
 > > {: .python}
@@ -384,10 +370,7 @@ We will take the last approach. Let's assume that the code for extracting `table
 
 ~~~
 import requests
-import lxml.etree
-
-def inner_text(element):
-    return ''.join(element.itertext())
+import lxml.html
 
 def get_resolutions_for_year(year_url, year):
     """Return a list of resolutions
@@ -397,7 +380,7 @@ def get_resolutions_for_year(year_url, year):
         {'date': ..., 'symbol': ..., 'url': ..., ''title': ..., }
     """
     response = requests.get(year_url)
-    tree = lxml.etree.HTML(response.content)
+    tree = lxml.html.fromstring(response.text)
     tables = tree.cssselect('#content > table')
     # Check you captured something and not more than you expected
     if len(tables) != 1:
@@ -427,7 +410,6 @@ for resolution in resolutions:
 We added:
 
 * a loop over each row, being a `<tr>` element;
-* the `inner_text` helper function, which gets all the text inside an element, even if it's inside a descendant element;
 * some code at the end to test if our scraper-in-progress is working.
 
 > ## Limit the number of URLs to scrape through while debugging
@@ -481,7 +463,7 @@ Let's start filling in the TODO above, extracting the symbol text for each resol
 
 ~~~
         children = row_elem.getchildren()
-        resolution['symbol'] = inner_text(children[0])
+        resolution['symbol'] = children[0].text_content()
 ~~~
 {: .python}
 
@@ -520,11 +502,11 @@ We can exclude the header with:
 
 Another approach would be to replace `table.cssselect('tr')` with `table.cssselect('tr')[1:]` to ignore the first row returned by the selector.
 
-To clean up the messy symbols, we have to realise that `"\r\n"` are special in Python: they indicate a line break (like pressing enter) in text. So what we have here is a sequence of _white-space characters_ including `"\r"`, `"\n"`, and `" "`. In HTML, a sequence of white-space characters is usually interpreted as a single space. The following is a replacement for `inner_text` which substitutes a single space for any white-space sequence in an element's text.
+To clean up the messy symbols, we have to realise that `"\r\n"` are special in Python: they indicate a line break (like pressing enter) in text. So what we have here is a sequence of _white-space characters_ including `"\r"`, `"\n"`, and `" "`. In HTML, a sequence of white-space characters is usually interpreted as a single space. The following substitutes a single space for any white-space sequence in retrieving an element's text.
 
 ~~~
-def inner_text(element):
-    all_text = ''.join(element.itertext())
+def clean_text(element):
+    all_text = element.text_content()
     cleaned = ' '.join(all_text.split())
     return cleaned
 ~~~
@@ -539,7 +521,7 @@ We can handle the fact that a date column may or may not be present with:
 ~~~
         if len(children) == 3:
             # there is a date column
-            resolution['date'] = inner_text(children[1])
+            resolution['date'] = clean_text(children[1])
         elif len(children) == 2:
             # adopt the year for the page
             resolution['date'] = year
@@ -567,7 +549,7 @@ Run this on 2016 and 1999 to check that the output is sensibly getting 'symbol' 
 > >             continue
 > >         relative_url = symbol_links[0].attrib['href']
 > >         resolution['url'] = requests.compat.urljoin(response.url, relative_url)
-> >         resolution['title'] = inner_text(children[-1])
+> >         resolution['title'] = clean_text(children[-1])
 > > ~~~
 > > {: .python}
 {: .challenge}
@@ -697,7 +679,7 @@ These quirks are somewhat peculiar to web sites that are _manually edited_. Howe
 >    ~~~
 >    {: .python}
 >    Consider this a last resort: if an error occurs, any resolutions scraped from the error year will not be output.
-> 4. Write helper functions to make cleaning and error identification easy for you. `inner_text` is one example. Another useful helper might be:
+> 4. Write helper functions to make cleaning and error identification easy for you. `clean_text` is one example. Another useful helper might be:
 >    ~~~
 >    def extract_one(list_of_extractions, default=None):
 >        if len(list_of_extractions) == 0:
